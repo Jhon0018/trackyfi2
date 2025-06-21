@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-import { getFirestore, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, query, where, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 // Configuración Firebase
 const firebaseConfig = {
@@ -17,7 +17,6 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 let currentUserId = null;
-// Suponiendo que tienes un array portfolioData en localStorage:
 let portfolioData = JSON.parse(localStorage.getItem('portfolioData') || '[]');
 let profitPieChart, profitBarChart;
 
@@ -59,76 +58,6 @@ function updateStats() {
 }
 
 // Gráficas
-function getProfitChartData() {
-    const labels = [];
-    const profits = [];
-    const colors = [];
-
-    portfolioData.forEach(asset => {
-        labels.push(asset.name + (asset.ticker ? ` (${asset.ticker})` : ''));
-        // Ganancia/pérdida = valor actual - (cantidad * precio compra) - comisión
-        const profit = (asset.value || (asset.quantity * asset.current_price)) - (asset.quantity * asset.purchase_price) - (asset.commission || 0);
-        profits.push(profit);
-        colors.push(profit >= 0 ? '#22c55e' : '#ef4444');
-    });
-
-    return { labels, profits, colors };
-}
-
-// Renderiza la gráfica de pastel y barras
-function renderProfitCharts() {
-    const { labels, profits, colors } = getProfitChartData();
-
-    // Pie Chart
-    const pieCtx = document.getElementById('profitPieChart').getContext('2d');
-    if (window.profitPieChart) window.profitPieChart.destroy();
-    window.profitPieChart = new Chart(pieCtx, {
-        type: 'pie',
-        data: {
-            labels: labels,
-            datasets: [{
-                data: profits,
-                backgroundColor: colors,
-            }]
-        },
-        options: {
-            plugins: {
-                legend: { display: true }
-            }
-        }
-    });
-
-    // Bar Chart
-    const barCtx = document.getElementById('profitBarChart').getContext('2d');
-    if (window.profitBarChart) window.profitBarChart.destroy();
-    window.profitBarChart = new Chart(barCtx, {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Ganancia/Pérdida',
-                data: profits,
-                backgroundColor: colors,
-            }]
-        },
-        options: {
-            plugins: {
-                legend: { display: false }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return '$' + value.toLocaleString();
-                        }
-                    }
-                }
-            }
-        }
-    });
-}
-
 function renderCharts() {
     if (!window.Chart) return;
     const labels = portfolioData.map(item => item.name + (item.ticker ? ` (${item.ticker})` : ''));
@@ -227,6 +156,16 @@ function renderPortfolio() {
     portfolioData.forEach((asset, idx) => {
         const profitClass = asset.profit >= 0 ? 'profit-positive' : 'profit-negative';
         const icon = asset.type === 'crypto' ? 'fab fa-bitcoin' : 'fas fa-chart-line';
+
+        // Si el precio actual es null, muestra mensaje de error en la tabla
+        const priceActual = (asset.current_price === null || asset.current_price === undefined)
+            ? '<span class="text-danger">No existe</span>'
+            : formatCurrency(asset.current_price);
+
+        const profitValue = (asset.current_price === null || asset.current_price === undefined)
+            ? '<span class="text-danger">No existe</span>'
+            : `<span class="${profitClass}">${formatCurrency(asset.profit)}</span>`;
+
         tableHTML += `
             <tr>
                 <td>
@@ -236,9 +175,9 @@ function renderPortfolio() {
                 <td>${asset.ticker}</td>
                 <td>${asset.quantity}</td>
                 <td>${formatCurrency(asset.purchase_price)}</td>
-                <td>${formatCurrency(asset.current_price)}</td>
-                <td>${formatCurrency(asset.value)}</td>
-                <td class="${profitClass}">${formatCurrency(asset.profit)}</td>
+                <td>${priceActual}</td>
+                <td>${asset.current_price === null || asset.current_price === undefined ? '<span class="text-danger">No existe</span>' : formatCurrency(asset.value)}</td>
+                <td>${profitValue}</td>
                 <td>${asset.currency || 'USD'}</td>
                 <td>
                     <button class="btn btn-info btn-sm" onclick="window.viewDetails(${idx})">
@@ -251,6 +190,9 @@ function renderPortfolio() {
                     </button>
                     <button class="btn btn-danger btn-sm" onclick="window.deleteAsset(${idx})">
                         <i class="fas fa-trash"></i>
+                    </button>
+                    <button class="btn btn-primary btn-sm" onclick="window.updateAssetPrice(${idx})">
+                        <i class="fas fa-sync-alt"></i>
                     </button>
                 </td>
             </tr>
@@ -409,6 +351,7 @@ window.viewDetails = function(idx) {
         <div class="mb-3">
             <strong>Notas:</strong> ${asset.notes || 'N/A'}
         </div>
+        
         <div class="mb-3">
             <strong>Comisión:</strong> ${asset.commission ? formatCurrency(asset.commission) : formatCurrency(0)}
         </div>
@@ -457,9 +400,15 @@ document.getElementById('toggleCryptoForm').addEventListener('click', function()
     form.style.display = form.style.display === 'none' ? 'block' : 'none';
 });
 
-
+// Modo oscuro
+const toggleThemeBtn = document.getElementById('toggleThemeBtn');
+toggleThemeBtn.addEventListener('click', function() {
+    const isDarkMode = document.body.classList.toggle('dark-mode');
+    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+    toggleThemeBtn.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    showAlert(isDarkMode ? 'Modo oscuro activado' : 'Modo claro activado', 'info');
+});
 document.addEventListener('DOMContentLoaded', function() {
-    const toggleThemeBtn = document.getElementById('toggleThemeBtn');
     function setThemeIcon() {
         if (document.body.classList.contains('dark-mode')) {
             toggleThemeBtn.innerHTML = '<i class="fas fa-sun"></i>';
@@ -467,19 +416,15 @@ document.addEventListener('DOMContentLoaded', function() {
             toggleThemeBtn.innerHTML = '<i class="fas fa-moon"></i>';
         }
     }
-    // Aplica el modo guardado
     if (localStorage.getItem('theme') === 'dark') {
         document.body.classList.add('dark-mode');
     }
     setThemeIcon();
-
     toggleThemeBtn.addEventListener('click', function() {
         const isDarkMode = document.body.classList.toggle('dark-mode');
         localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
         setThemeIcon();
-        if (typeof showAlert === "function") {
-            showAlert(isDarkMode ? 'Modo oscuro activado' : 'Modo claro activado', 'info');
-        }
+        showAlert(isDarkMode ? 'Modo oscuro activado' : 'Modo claro activado', 'info');
     });
 });
 
@@ -521,5 +466,78 @@ onAuthStateChanged(auth, (user) => {
 // Inicialización
 updateStats();
 renderPortfolio();
-renderProfitCharts();
 
+// Para acciones (stocks)
+async function getCurrentPriceYahoo(symbol) {
+    const url = `https://apidojo-yahoo-finance-v1.p.rapidapi.com/market/v2/get-quotes?symbols=${symbol}&region=US`;
+    const options = {
+        method: 'GET',
+        headers: {
+            'x-rapidapi-host': 'apidojo-yahoo-finance-v1.p.rapidapi.com',
+            'x-rapidapi-key': '86e6592280mshb63eb4f106fe42cp14510djsn915f913aba12'
+        }
+    };
+    try {
+        const res = await fetch(url, options);
+        const data = await res.json();
+        if (data?.quoteResponse?.result?.length > 0) {
+            return data.quoteResponse.result[0].regularMarketPrice;
+        }
+        return null;
+    } catch (e) {
+        return null;
+    }
+}
+
+// Para criptomonedas (CoinGecko)
+async function getCurrentPriceCrypto(cryptoId, currency = 'usd') {
+    const url = `https://api.coingecko.com/api/v3/simple/price?ids=${cryptoId}&vs_currencies=${currency}`;
+    try {
+        const res = await fetch(url);
+        const data = await res.json();
+        return data[cryptoId] ? data[cryptoId][currency] : null;
+    } catch (e) {
+        return null;
+    }
+}
+
+// Actualiza el precio y recalcula ganancia/pérdida
+window.updateAssetPrice = async function(idx) {
+    const asset = portfolioData[idx];
+    if (!asset) return;
+
+    let price = null;
+    if (asset.type === "crypto") {
+        price = await getCurrentPriceCrypto(asset.name.toLowerCase(), (asset.currency || 'usd').toLowerCase());
+        if (price === null || price === undefined) {
+            asset.current_price = null;
+            asset.value = null;
+            asset.profit = null;
+            savePortfolio();
+            updateStats();
+            renderPortfolio();
+            showAlert(`La criptomoneda "${asset.name}" no existe o el id es incorrecto.`, 'danger');
+            return;
+        }
+    } else {
+        price = await getCurrentPriceYahoo(asset.ticker);
+        if (price === null || price === undefined) {
+            asset.current_price = null;
+            asset.value = null;
+            asset.profit = null;
+            savePortfolio();
+            updateStats();
+            renderPortfolio();
+            showAlert(`El activo "${asset.ticker}" no existe o el ticker es incorrecto.`, 'danger');
+            return;
+        }
+    }
+
+    asset.current_price = price;
+    asset.value = asset.quantity * asset.current_price;
+    asset.profit = asset.value - (asset.quantity * asset.purchase_price) - (asset.commission || 0);
+    savePortfolio();
+    updateStats();
+    renderPortfolio();
+    showAlert(`Precio actualizado para ${asset.name}: ${formatCurrency(price)}`, 'success');
+};
