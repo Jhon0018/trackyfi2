@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>TrackYfi - Tu Portafolio de Inversiones</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: #fff;
+            min-height: 100vh;
+            color: #000;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .navbar {
+            background-color: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            transition: background 0.3s, border-bottom 0.3s;
+        }
+
+        .navbar-brand {
+            color: #000 !important;
+            font-weight: bold;
+            letter-spacing: 1px;
+            font-size: 1.5rem;
+            transition: color 0.3s;
+        }
+
+        .btn-custom, .btn-success {
+            background-color: #fff !important;
+            color: #000 !important;
+            border: 1px solid #000;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-custom:hover, .btn-success:hover {
+            background-color: #000 !important;
+            color: #fff !important;
+            border: 1px solid #000;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .hero-section {
+            padding: 100px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: #000;
+            margin-bottom: 1.5rem;
+            transition: color 0.3s;
+        }
+
+        .hero-subtitle {
+            font-size: 1.4rem;
+            color: #555;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+            transition: color 0.3s;
+        }
+
+        .feature-card {
+            background: rgba(255,255,255,0.8);
+            border-radius: 1rem;
+            padding: 2rem;
+            height: 100%;
+            border: 1px solid #000;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            color: #000;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border-color: #000;
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: #000;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            color: #fff;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .feature-title {
+            color: #000;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            transition: color 0.3s;
+        }
+
+        .feature-description {
+            color: #555;
+            line-height: 1.6;
+            transition: color 0.3s;
+        }
+
+        .stats-section {
+            background: rgba(255,255,255,0.6);
+            backdrop-filter: blur(20px);
+            padding: 4rem 0;
+            margin: 4rem 0;
+            border-radius: 2rem;
+            border: 1px solid #000;
+            transition: background 0.3s, border 0.3s;
+        }
+
+        .stat-item {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #000;
+            display: block;
+            transition: color 0.3s;
+        }
+
+        .stat-label {
+            color: #555;
+            font-size: 1.1rem;
+            margin-top: 0.5rem;
+            transition: color 0.3s;
+        }
+
+        .cta-section {
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        .cta-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #000;
+            margin-bottom: 1rem;
+            transition: color 0.3s;
+        }
+
+        .cta-subtitle {
+            font-size: 1.2rem;
+            color: #555;
+            margin-bottom: 2rem;
+            transition: color 0.3s;
+        }
+
+        .login-form {
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(20px);
+            border-radius: 1rem;
+            padding: 2rem;
+            border: 1px solid #000;
+            max-width: 400px;
+            margin: 0 auto;
+            color: #000;
+            transition: background 0.3s, border 0.3s, color 0.3s;
+        }
+
+        .form-control {
+            background: rgba(255,255,255,0.8);
+            border: 1px solid #000;
+            color: #000;
+            padding: 12px 16px;
+            border-radius: 8px;
+            transition: background 0.3s, border 0.3s, color 0.3s;
+        }
+
+        .form-control:focus {
+            background: rgba(255,255,255,0.9);
+            border-color: #000;
+            box-shadow: 0 0 0 0.2rem rgba(0,0,0,0.15);
+            color: #000;
+        }
+
+        .form-control::placeholder {
+            color: #888;
+            transition: color 0.3s;
+        }
+
+        .form-label {
+            color: #555;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .alert {
+            background: rgba(0,0,0,0.05);
+            border: 1px solid #000;
+            color: #000;
+            border-radius: 8px;
+            transition: background 0.3s, border 0.3s, color 0.3s;
+        }
+
+        .alert-success {
+            background: rgba(0,0,0,0.1);
+            border: 1px solid #000;
+            color: #000;
+        }
+
+        .floating-shapes {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .shape {
+            position: absolute;
+            opacity: 0.1;
+            animation: float 20s infinite linear;
+        }
+
+        .shape i {
+            color: #000 !important;
+            transition: color 0.3s;
+        }
+
+        .shape:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
+        .shape:nth-child(2) { top: 60%; right: 15%; animation-delay: 7s; }
+        .shape:nth-child(3) { bottom: 20%; left: 20%; animation-delay: 14s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            25% { transform: translateY(-20px) rotate(90deg); }
+            50% { transform: translateY(-10px) rotate(180deg); }
+            75% { transform: translateY(-30px) rotate(270deg); }
+        }
+
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.5rem; }
+            .hero-subtitle { font-size: 1.1rem; }
+            .feature-card { margin-bottom: 2rem; }
+        }
+
+        .user-info {
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(20px);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            border: 1px solid #000;
+            margin-bottom: 2rem;
+            color: #000;
+            transition: background 0.3s, border 0.3s, color 0.3s;
+        }
+
+        .welcome-text {
+            color: #000;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            transition: color 0.3s;
+        }
+
+        .user-email {
+            color: #555;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        /* --- MODO OSCURO --- */
+        body.dark-mode {
+            background: #000 !important;
+            color: #fff !important;
+        }
+        body.dark-mode .navbar {
+            background-color: rgba(0,0,0,0.95) !important;
+            border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+        }
+        body.dark-mode .navbar-brand,
+        body.dark-mode .feature-title,
+        body.dark-mode .hero-title,
+        body.dark-mode .cta-title,
+        body.dark-mode .stat-number {
+            color: #fff !important;
+        }
+        body.dark-mode .feature-card,
+        body.dark-mode .login-form,
+        body.dark-mode .user-info,
+        body.dark-mode .stats-section {
+            background: rgba(0,0,0,0.8) !important;
+            border: 1px solid #fff !important;
+            color: #fff !important;
+        }
+        body.dark-mode .btn-custom, 
+        body.dark-mode .btn-success {
+            background-color: #000 !important;
+            color: #fff !important;
+            border: 1px solid #fff !important;
+        }
+        body.dark-mode .btn-custom:hover, 
+        body.dark-mode .btn-success:hover {
+            background-color: #fff !important;
+            color: #000 !important;
+            border: 1px solid #fff !important;
+        }
+        body.dark-mode .form-control {
+            background: rgba(0,0,0,0.8) !important;
+            border: 1px solid #fff !important;
+            color: #fff !important;
+        }
+        body.dark-mode .form-control::placeholder {
+            color: #ccc !important;
+        }
+        body.dark-mode .alert {
+            background: rgba(255,255,255,0.05) !important;
+            border: 1px solid #fff !important;
+            color: #fff !important;
+        }
+        body.dark-mode .feature-icon {
+            background: #fff !important;
+            color: #000 !important;
+        }
+        body.dark-mode .shape i {
+            color: #fff !important;
+        }
+
+        /* Menú lateral modo oscuro */
+        body.dark-mode .offcanvas {
+            background-color: #111 !important;
+            color: #fff !important;
+        }
+        body.dark-mode .offcanvas .offcanvas-title,
+        body.dark-mode .offcanvas .list-group-item a {
+            color: #fff !important;
+        }
+        body.dark-mode .offcanvas .list-group-item {
+            background: transparent !important;
+            border-color: #333 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-shapes">
+        <div class="shape">
+            <i class="fas fa-chart-line" style="font-size: 3rem; color: #000;"></i>
+        </div>
+        <div class="shape">
+            <i class="fas fa-coins" style="font-size: 2.5rem; color: #000;"></i>
+        </div>
+        <div class="shape">
+            <i class="fas fa-trending-up" style="font-size: 3.5rem; color: #000;"></i>
+        </div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-chart-pie me-2"></i>TrackYfi
+            </a>
+            <div class="navbar-nav ms-auto">
+                <div id="authButtons">
+                    <button class="btn btn-custom me-2" id="loginBtn">Iniciar Sesión</button>
+                    <button class="btn btn-success" id="registerBtn">Registrarse</button>
+                </div>
+                <div id="userInfo" class="d-none">
+                    <span class="navbar-text me-3" id="userEmail"></span>
+                    <a href="http://127.0.0.1:5500/trackyfi/templates/index.html" class="btn btn-custom me-2" id="dashboardBtn">tu portafolio</a>
+                    <button class="btn btn-outline-dark" id="logoutBtn">Cerrar Sesión</button>
+                </div>
+                <!-- Botón para cambiar modo blanco/negro -->
+                <button class="btn btn-outline-dark ms-2" id="toggleThemeBtn" title="Cambiar modo blanco/negro">
+                    <i class="fas fa-adjust"></i>
+                </button>
+                <!-- Botón para abrir el menú lateral -->
+                <button class="btn btn-outline-dark ms-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu" aria-controls="sideMenu" title="Menú">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Menú lateral derecho -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="sideMenu" aria-labelledby="sideMenuLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="sideMenuLabel">Menú</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+  </div>
+  <div class="offcanvas-body">
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item bg-transparent"><a href="/" class="text-decoration-none text-dark">Inicio</a></li>
+      <li class="list-group-item bg-transparent"><a href="/dashboard" class="text-decoration-none text-dark">Dashboard</a></li>
+      <li class="list-group-item bg-transparent"><a href="#" class="text-decoration-none text-dark">Perfil</a></li>
+      <li class="list-group-item bg-transparent"><a href="#" class="text-decoration-none text-dark">Configuración</a></li>
+      <li class="list-group-item bg-transparent"><a href="#" class="text-decoration-none text-dark">Ayuda</a></li>
+    </ul>
+  </div>
+</div>
+
+    <!-- Sección Hero -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="hero-title">Controla tus Inversiones con Inteligencia</h1>
+                    <p class="hero-subtitle">
+                        TrackYfi te permite monitorear y gestionar tu portafolio de inversiones en tiempo real. 
+                        Acciones, criptomonedas y más, todo en un solo lugar.
+                    </p>
+                    <div class="d-flex gap-3 flex-wrap">
+                        <button class="btn btn-custom btn-lg" id="getStartedBtn">
+                            <i class="fas fa-rocket me-2"></i>Comenzar Ahora
+                        </button>
+                        <button class="btn btn-outline-light btn-lg">
+                            <i class="fas fa-play me-2"></i>Ver Demo
+                        </button>
+                    </div>
+                </div>
+                <div class="col-lg-6 mt-5 mt-lg-0">
+                    
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección de Estadísticas -->
+    <section class="stats-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="stat-item">
+                        <span class="stat-number">10K+</span>
+                        <div class="stat-label">Usuarios Activos</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-item">
+                        <span class="stat-number">$50M+</span>
+                        <div class="stat-label">Capital Gestionado</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-item">
+                        <span class="stat-number">99.9%</span>
+                        <div class="stat-label">Tiempo de Actividad</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección de Características -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row text-center mb-5">
+                <div class="col-12">
+                    <h2 class="display-5 fw-bold mb-3" style="color:rgb(0, 0, 0);">¿Por qué elegir TrackYfi?</h2>
+                    <p class="lead" style="color:rgb(0, 0, 0);">Potencia tu estrategia de inversión con nuestras herramientas avanzadas</p>
+                </div>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3 class="feature-title">Seguimiento en Tiempo Real</h3>
+                        <p class="feature-description">
+                            Monitorea el rendimiento de tus inversiones con datos actualizados al minuto. 
+                            Nunca pierdas una oportunidad del mercado.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3 class="feature-title">Seguridad Avanzada</h3>
+                        <p class="feature-description">
+                            Tus datos están protegidos con encriptación de nivel bancario y autenticación 
+                            de múltiples factores.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <h3 class="feature-title">Multiplataforma</h3>
+                        <p class="feature-description">
+                            Accede a tu portafolio desde cualquier dispositivo. Diseño responsivo 
+                            optimizado para móviles y tablets.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <h3 class="feature-title">Multi-Activos</h3>
+                        <p class="feature-description">
+                            Gestiona acciones, criptomonedas, ETFs y más. Todo tu portafolio 
+                            diversificado en una sola plataforma.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h3 class="feature-title">Analytics Inteligentes</h3>
+                        <p class="feature-description">
+                            Obtén insights profundos sobre tu portafolio con análisis automatizado 
+                            y recomendaciones personalizadas.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <h3 class="feature-title">Alertas Personalizadas</h3>
+                        <p class="feature-description">
+                            Configura alertas de precio, volumen y rendimiento. Mantente informado 
+                            sin estar pegado a la pantalla.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Formulario de Login/Registro -->
+    <section id="authSection" class="py-5 d-none">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-7">
+                    <div class="login-form">
+                        <h3 class="text-center mb-4" style="color:rgb(0, 0, 0);" id="authTitle">Iniciar Sesión</h3>
+                        
+                        <div id="alertContainer"></div>
+                        
+                        <form id="authForm">
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" required placeholder="tu@email.com">
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Contraseña</label>
+                                <input type="password" class="form-control" id="password" required placeholder="••••••••">
+                            </div>
+                            <button type="submit" class="btn btn-custom w-100 mb-3" id="authSubmitBtn">
+                                Iniciar Sesión
+                            </button>
+                            <!-- Casilla solo visible en modo registro, centrada y abajo -->
+                            <div class="d-none" id="termsContainer">
+                                <div class="form-check d-flex justify-content-center">
+                                    <input class="form-check-input me-2" type="checkbox" id="termsCheck">
+                                    <label class="form-check-label small" for="termsCheck">
+                                        Acepto los <a href="#" target="_blank" style="text-decoration: underline;">Términos y Condiciones</a>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="text-center mb-2 mt-3">
+                                <button type="button" class="btn btn-link" id="forgotPasswordBtn" style="color: #3b82f6;">
+                                    ¿Olvidaste tu contraseña?
+                                </button>
+                            </div>
+                            <div class="text-center">
+                                <button class="btn btn-link" id="toggleAuthBtn" style="color: #3b82f6;">
+                                    ¿No tienes cuenta? Regístrate
+                                </button>
+                            </div>
+                        </form>
+                        
+                        <!-- Botón de autenticación con Google -->
+                        <button type="button" class="btn btn-outline-dark w-100 mb-3 d-flex align-items-center justify-content-center" id="googleAuthBtn">
+    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" style="width:24px; height:24px; margin-right:8px;">
+    Continuar con Google
+</button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección CTA -->
+    <section class="cta-section" id="ctaSection">
+        <div class="container text-center">
+            <h2 class="cta-title">¿Listo para optimizar tus inversiones?</h2>
+            <p class="cta-subtitle">Únete a miles de inversionistas que ya confían en TrackYfi</p>
+            <button class="btn btn-success btn-lg" id="startNowBtn">
+                <i class="fas fa-arrow-right me-2"></i>Comenzar Gratis
+            </button>
+        </div>
+    </section>
+
+    <!-- Modal para restablecer contraseña -->
+<div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-labelledby="resetPasswordModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="resetPasswordForm">
+        <div class="modal-header">
+          <h5 class="modal-title" id="resetPasswordModalLabel">Restablecer contraseña</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="resetEmail" class="form-label">Correo electrónico</label>
+            <input type="email" class="form-control" id="resetEmail" required placeholder="tu@email.com">
+          </div>
+          <div id="resetPasswordAlert"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Enviar enlace</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
+        import { getAnalytics } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js';
+        import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBj0vG5CgWxEBrvkNBMvMU9TFcKuqLP0cc",
+            authDomain: "trackyfi-317e1.firebaseapp.com",
+            projectId: "trackyfi-317e1",
+            storageBucket: "trackyfi-317e1.appspot.com",
+            messagingSenderId: "843779589124",
+            appId: "1:843779589124:web:d782b98668b1c16ce0a151",
+            measurementId: "G-9DQCFXXND3"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const analytics = getAnalytics(app);
+        const db = getFirestore(app);
+
+        // Variables globales
+        let isLoginMode = true;
+
+        // Elementos del DOM
+        const authButtons = document.getElementById('authButtons');
+        const userInfo = document.getElementById('userInfo');
+        const userEmail = document.getElementById('userEmail');
+        const authSection = document.getElementById('authSection');
+        const ctaSection = document.getElementById('ctaSection');
+        const authForm = document.getElementById('authForm');
+        const authTitle = document.getElementById('authTitle');
+        const authSubmitBtn = document.getElementById('authSubmitBtn');
+        const toggleAuthBtn = document.getElementById('toggleAuthBtn');
+        const alertContainer = document.getElementById('alertContainer');
+
+        // Funciones de utilidad
+        function showAlert(message, type = 'danger') {
+            alertContainer.innerHTML = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+        }
+
+        function toggleAuthMode() {
+            isLoginMode = !isLoginMode;
+            if (isLoginMode) {
+                authTitle.textContent = 'Iniciar Sesión';
+                authSubmitBtn.textContent = 'Iniciar Sesión';
+                toggleAuthBtn.innerHTML = '¿No tienes cuenta? Regístrate';
+                document.getElementById('termsContainer').classList.add('d-none');
+            } else {
+                authTitle.textContent = 'Crear Cuenta';
+                authSubmitBtn.textContent = 'Registrarse';
+                toggleAuthBtn.innerHTML = '¿Ya tienes cuenta? Inicia sesión';
+                document.getElementById('termsContainer').classList.remove('d-none');
+            }
+            alertContainer.innerHTML = '';
+        }
+
+        function showAuthSection() {
+            authSection.classList.remove('d-none');
+            ctaSection.classList.add('d-none');
+            authSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function hideAuthSection() {
+            authSection.classList.add('d-none');
+            ctaSection.classList.remove('d-none');
+        }
+
+        // Event listeners
+        document.getElementById('loginBtn').addEventListener('click', () => {
+            isLoginMode = true;
+            toggleAuthMode();
+            showAuthSection();
+        });
+
+        document.getElementById('registerBtn').addEventListener('click', () => {
+            isLoginMode = false;
+            toggleAuthMode();
+            showAuthSection();
+        });
+
+        document.getElementById('getStartedBtn').addEventListener('click', () => {
+            isLoginMode = false;
+            toggleAuthMode();
+            showAuthSection();
+        });
+
+        document.getElementById('startNowBtn').addEventListener('click', () => {
+            isLoginMode = false;
+            toggleAuthMode();
+            showAuthSection();
+        });
+
+        toggleAuthBtn.addEventListener('click', toggleAuthMode);
+
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+                showAlert('Sesión cerrada exitosamente', 'success');
+            } catch (error) {
+                showAlert('Error al cerrar sesión: ' + error.message);
+            }
+        });
+
+        document.getElementById('dashboardBtn').addEventListener('click', () => {
+    window.location.href = 'index.html';
+});
+
+        // Manejo del formulario de autenticación
+        authForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            if (!isLoginMode) {
+                const termsAccepted = document.getElementById('termsCheck').checked;
+                if (!termsAccepted) {
+                    showAlert('Debes aceptar los Términos y Condiciones para registrarte.');
+                    return;
+                }
+            }
+            try {
+                if (isLoginMode) {
+                    await signInWithEmailAndPassword(auth, email, password);
+                    // Después de autenticación exitosa con email/contraseña
+                    showAlert('¡Inicio de sesión exitoso!', 'success');
+                    authForm.reset();
+                    hideAuthSection();
+                    window.location.href = "index.html?bienvenida=1"; // Redirige al dashboard
+                } else {
+                    await createUserWithEmailAndPassword(auth, email, password);
+                    showAlert('¡Cuenta creada exitosamente!', 'success');
+                }
+                
+                // Limpiar formulario
+                authForm.reset();
+                hideAuthSection();
+                
+            } catch (error) {
+                let errorMessage = 'Error desconocido';
+                
+                switch (error.code) {
+                    case 'auth/email-already-in-use':
+                        errorMessage = 'Este email ya está registrado';
+                        break;
+                    case 'auth/weak-password':
+                        errorMessage = 'La contraseña debe tener al menos 6 caracteres';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = 'Email inválido';
+                        break;
+                    case 'auth/user-not-found':
+                    case 'auth/wrong-password':
+                        errorMessage = 'Datos incorrectos. Verifica tu email y contraseña.';
+                        break;
+                    default:
+                        errorMessage = 'Ocurrió un error. Intenta nuevamente.';
+                }
+                
+                showAlert(errorMessage);
+            }
+        });
+
+        document.getElementById('forgotPasswordBtn').addEventListener('click', () => {
+    // Limpia el formulario y alertas del modal
+    document.getElementById('resetEmail').value = '';
+    document.getElementById('resetPasswordAlert').innerHTML = '';
+    // Abre el modal
+    const modal = new bootstrap.Modal(document.getElementById('resetPasswordModal'));
+    modal.show();
+});
+
+        document.getElementById('googleAuthBtn').addEventListener('click', async () => {
+            const provider = new GoogleAuthProvider();
+            try {
+                const result = await signInWithPopup(auth, provider);
+                const user = result.user;
+
+                // Verifica si el usuario ya existe en Firestore
+                const userRef = doc(db, "users", user.uid);
+                const userSnap = await getDoc(userRef);
+
+                if (!userSnap.exists()) {
+                    // Si no existe, crea el documento del usuario
+                    await setDoc(userRef, {
+                        email: user.email,
+                        nombre: user.displayName || "",
+                        creado: new Date()
+                    });
+                }
+
+                // Después de autenticación exitosa con Google
+                showAlert('¡Autenticación con Google exitosa!', 'success');
+                authForm.reset();
+                hideAuthSection();
+                window.location.href = "index.html"; // Redirige al dashboard
+            } catch (error) {
+                showAlert('No se pudo autenticar con Google. Intenta nuevamente.');
+            }
+        });
+
+        // Monitorear estado de autenticación
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Usuario autenticado
+                authButtons.classList.add('d-none');
+                userInfo.classList.remove('d-none');
+                userEmail.textContent = user.email;
+                hideAuthSection();
+            } else {
+                // Usuario no autenticado
+                authButtons.classList.remove('d-none');
+                userInfo.classList.add('d-none');
+                hideAuthSection();
+            }
+        });
+
+        // Animación suave para los elementos
+        window.addEventListener('scroll', () => {
+            const elements = document.querySelectorAll('.feature-card');
+            elements.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 150;
+                
+                if (elementTop < window.innerHeight - elementVisible) {
+                    element.style.opacity = '1';
+                    element.style.transform = 'translateY(0)';
+                }
+            });
+        });
+
+        document.getElementById('resetPasswordForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('resetEmail').value;
+    const alertDiv = document.getElementById('resetPasswordAlert');
+    try {
+        await sendPasswordResetEmail(auth, email);
+        alertDiv.innerHTML = `<div class="alert alert-success">Se ha enviado un enlace de recuperación a tu correo.</div>`;
+    } catch (error) {
+        alertDiv.innerHTML = `<div class="alert alert-danger">No se pudo enviar el correo de recuperación: ${error.message}</div>`;
+    }
+});
+
+// Cambiar entre modo claro y oscuro
+document.getElementById('toggleThemeBtn').addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+});
+    </script>
+</body>
+</html>

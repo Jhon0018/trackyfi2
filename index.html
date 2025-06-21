@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>TrackYfi - Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: #fff;
+            min-height: 100vh;
+            color: #000;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background 0.3s, color 0.3s;
+        }
+        .navbar {
+            background-color: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            transition: background 0.3s, border-bottom 0.3s;
+        }
+        .navbar-brand {
+            color: #000 !important;
+            font-weight: bold;
+            letter-spacing: 1px;
+            font-size: 1.5rem;
+            transition: color 0.3s;
+        }
+        .btn-custom, .btn-success {
+            background-color: #fff !important;
+            color: #000 !important;
+            border: 1px solid #000;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .btn-custom:hover, .btn-success:hover {
+            background-color: #000 !important;
+            color: #fff !important;
+            border: 1px solid #000;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        .dashboard-container {
+            padding-top: 100px;
+            min-height: 100vh;
+        }
+        .card {
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid #000;
+            border-radius: 1rem;
+            color: #000;
+            transition: background 0.3s, border 0.3s, color 0.3s;
+        }
+        .card-header {
+            background: rgba(0,0,0,0.05);
+            border-bottom: 1px solid #000;
+            color: #000;
+            font-weight: 600;
+        }
+        .form-control {
+            background: rgba(255,255,255,0.8);
+            border: 1px solid #000;
+            color: #000;
+            border-radius: 8px;
+            transition: background 0.3s, border 0.3s, color 0.3s;
+        }
+        .form-control:focus {
+            background: rgba(255,255,255,0.9);
+            border-color: #000;
+            box-shadow: 0 0 0 0.2rem rgba(0,0,0,0.15);
+            color: #000;
+        }
+        .form-control::placeholder {
+            color: #888;
+        }
+        .form-label {
+            color: #555;
+            font-weight: 500;
+        }
+        .stats-card {
+            background: rgba(255,255,255,0.8);
+            border: 1px solid #000;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            color: #000;
+        }
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #000;
+        }
+        .stat-label {
+            color: #555;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+        .profit-positive {
+            color: #22c55e !important;
+        }
+        .profit-negative {
+            color: #ef4444 !important;
+        }
+        .alert {
+            background: rgba(0,0,0,0.05);
+            border: 1px solid #000;
+            color: #000;
+            border-radius: 8px;
+        }
+        .alert-success {
+            background: rgba(0,0,0,0.1);
+            border: 1px solid #000;
+            color: #000;
+        }
+        .btn-sm {
+            font-size: 0.8rem;
+            padding: 0.25rem 0.5rem;
+        }
+        .empty-portfolio {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #555;
+        }
+        .empty-portfolio i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: #000;
+        }
+        /* --- MODO OSCURO --- */
+        body.dark-mode {
+            background: #000 !important;
+            color: #fff !important;
+        }
+        body.dark-mode .navbar {
+            background-color: rgba(0,0,0,0.95) !important;
+            border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+        }
+        body.dark-mode .navbar-brand,
+        body.dark-mode .feature-title,
+        body.dark-mode .stat-value {
+            color: #fff !important;
+        }
+        body.dark-mode .card,
+        body.dark-mode .stats-card {
+            background: rgba(0,0,0,0.8) !important;
+            border: 1px solid #fff !important;
+            color: #fff !important;
+        }
+        body.dark-mode .btn-custom, 
+        body.dark-mode .btn-success {
+            background-color: #000 !important;
+            color: #fff !important;
+            border: 1px solid #fff !important;
+        }
+        body.dark-mode .btn-custom:hover, 
+        body.dark-mode .btn-success:hover {
+            background-color: #fff !important;
+            color: #000 !important;
+            border: 1px solid #fff !important;
+        }
+        body.dark-mode .form-control {
+            background: rgba(0,0,0,0.8) !important;
+            border: 1px solid #fff !important;
+            color: #fff !important;
+        }
+        body.dark-mode .form-control::placeholder {
+            color: #ccc !important;
+        }
+        body.dark-mode .alert {
+            background: rgba(255,255,255,0.05) !important;
+            border: 1px solid #fff !important;
+            color: #fff !important;
+        }
+        body.dark-mode .empty-portfolio i {
+            color: #fff !important;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-chart-pie me-2"></i>TrackYfi
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3" id="userEmail"></span>
+               <a href="http://127.0.0.1:5500/trackyfi/templates/inicio.html" class="btn btn-outline-dark me-2">Inicio</a>
+                <button class="btn btn-outline-dark me-2" id="logoutBtn">Cerrar Sesión</button>
+                <button class="btn btn-outline-dark ms-2" id="toggleThemeBtn" title="Cambiar modo blanco/negro">
+                    <i class="fas fa-adjust"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="container">
+            <!-- Alertas -->
+            <div id="alertsContainer"></div>
+
+            <!-- Estadísticas -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="stats-card">
+                        <div class="stat-value" id="totalValue">$0.00</div>
+                        <div class="stat-label">Valor Total</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stats-card">
+                        <div class="stat-value" id="totalInvestment">$0.00</div>
+                        <div class="stat-label">Inversión Total</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stats-card">
+                        <div class="stat-value" id="totalProfit">$0.00</div>
+                        <div class="stat-label">Ganancia/Pérdida</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formularios de Agregar Assets -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-plus-circle me-2"></i>Agregar Activo
+                        </div>
+                        <div class="card-body">
+                            <!-- Formulario de agregar activo -->
+<form id="addAssetForm">
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="name" class="form-label">Nombre</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label for="ticker" class="form-label">Ticker</label>
+            <input type="text" class="form-control" id="ticker" name="ticker">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="isin" class="form-label">ISIN</label>
+            <input type="text" class="form-control" id="isin" name="isin">
+        </div>
+        <div class="col-md-6 mb-3">
+            <label for="quantity" class="form-label">Cantidad</label>
+            <input type="number" step="0.01" class="form-control" id="quantity" name="quantity" required>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label for="purchase_price" class="form-label">Precio de Compra</label>
+        <input type="number" step="0.01" class="form-control" id="purchase_price" name="purchase_price" required>
+    </div>
+    <div class="mb-3">
+        <label for="currency" class="form-label">Divisa</label>
+        <select class="form-control" id="currency" name="currency">
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+            <option value="COP">COP</option>
+            <option value="MXN">MXN</option>
+        </select>
+    </div>
+    <button type="button" class="btn btn-outline-dark mb-2" id="toggleDetailsAsset">+ Más Detalle</button>
+    <div id="assetDetails" style="display:none;">
+        <div class="mb-3">
+            <label for="purchase_date" class="form-label">Fecha de compra</label>
+            <input type="date" class="form-control" id="purchase_date" name="purchase_date">
+        </div>
+        <div class="mb-3">
+            <label for="notes" class="form-label">Notas o Comentarios</label>
+            <textarea class="form-control" id="notes" name="notes"></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="commission" class="form-label">Comisión</label>
+            <input type="number" step="0.01" class="form-control" id="commission" name="commission">
+        </div>
+        <div class="mb-3">
+            <label for="broker" class="form-label">Broker / Plataforma</label>
+            <input type="text" class="form-control" id="broker" name="broker">
+        </div>
+    </div>
+    <button type="submit" class="btn btn-custom w-100">
+        <i class="fas fa-plus me-2"></i>Agregar Activo
+    </button>
+</form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fab fa-bitcoin me-2"></i>Agregar Criptomoneda
+                        </div>
+                        <div class="card-body">
+                            <!-- Formulario de agregar cripto -->
+<form id="addCryptoForm">
+    <div class="mb-3">
+        <label for="crypto_name" class="form-label">Criptomoneda</label>
+        <input type="text" class="form-control" id="crypto_name" name="crypto_name" placeholder="bitcoin,BTC" required>
+        <div class="form-text text-muted">Formato: id_coingecko,TICKER</div>
+    </div>
+    <div class="mb-3">
+        <label for="crypto_quantity" class="form-label">Cantidad</label>
+        <input type="number" step="0.00000001" class="form-control" id="crypto_quantity" name="crypto_quantity" required>
+    </div>
+    <div class="mb-3">
+        <label for="crypto_purchase_price" class="form-label">Precio de Compra</label>
+        <input type="number" step="0.01" class="form-control" id="crypto_purchase_price" name="crypto_purchase_price" required>
+    </div>
+    <div class="mb-3">
+        <label for="crypto_currency" class="form-label">Divisa</label>
+        <select class="form-control" id="crypto_currency" name="crypto_currency">
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+            <option value="COP">COP</option>
+            <option value="MXN">MXN</option>
+        </select>
+    </div>
+    <button type="button" class="btn btn-outline-dark mb-2" id="toggleDetailsCrypto">+ Más Detalle</button>
+    <div id="cryptoDetails" style="display:none;">
+        <div class="mb-3">
+            <label for="crypto_purchase_date" class="form-label">Fecha de compra</label>
+            <input type="date" class="form-control" id="crypto_purchase_date" name="crypto_purchase_date">
+        </div>
+        <div class="mb-3">
+            <label for="crypto_notes" class="form-label">Notas o Comentarios</label>
+            <textarea class="form-control" id="crypto_notes" name="crypto_notes"></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="crypto_commission" class="form-label">Comisión</label>
+            <input type="number" step="0.01" class="form-control" id="crypto_commission" name="crypto_commission">
+        </div>
+        <div class="mb-3">
+            <label for="crypto_broker" class="form-label">Broker / Plataforma</label>
+            <input type="text" class="form-control" id="crypto_broker" name="crypto_broker">
+        </div>
+    </div>
+    <button type="submit" class="btn btn-success w-100">
+        <i class="fab fa-bitcoin me-2"></i>Agregar Cripto
+    </button>
+</form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla de Portafolio -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-chart-line me-2"></i>Mi Portafolio
+                    <button class="btn btn-sm btn-outline-dark float-end" id="refreshBtn">
+                        <i class="fas fa-sync-alt me-1"></i>Actualizar
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div id="portfolioContent">
+                        <div class="empty-portfolio">
+                            <i class="fas fa-chart-pie"></i>
+                            <h4>Tu portafolio está vacío</h4>
+                            <p>Comienza agregando tus primeros activos o criptomonedas</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para editar activo -->
+    <div class="modal fade" id="editModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content bg-white dark-mode">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title">Editar Activo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editAssetForm">
+                        <input type="hidden" id="editAssetId">
+                        <div class="mb-3">
+                            <label for="editName" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="editName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editQuantity" class="form-label">Cantidad</label>
+                            <input type="number" step="0.00000001" class="form-control" id="editQuantity" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editPurchasePrice" class="form-label">Precio de Compra</label>
+                            <input type="number" step="0.01" class="form-control" id="editPurchasePrice" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-custom" id="saveEditBtn">Guardar Cambios</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para ver detalles -->
+    <div class="modal fade" id="viewDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content bg-white dark-mode">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title">Detalles del Activo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="viewDetailsContent">
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // --- PORTAFOLIO PERSISTENTE EN LOCALSTORAGE ---
+        let portfolioData = JSON.parse(localStorage.getItem('portfolioData') || '[]');
+
+        function savePortfolio() {
+            localStorage.setItem('portfolioData', JSON.stringify(portfolioData));
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD'
+            }).format(amount);
+        }
+
+        function showAlert(message, type = 'info') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.getElementById('alertsContainer').appendChild(alertDiv);
+            setTimeout(() => {
+                if (alertDiv.parentNode) alertDiv.remove();
+            }, 5000);
+        }
+
+        function updateStats() {
+            const totalValue = portfolioData.reduce((sum, item) => sum + item.value, 0);
+            const totalInvestment = portfolioData.reduce((sum, item) => sum + (item.quantity * item.purchase_price), 0);
+            const totalProfit = totalValue - totalInvestment;
+
+            document.getElementById('totalValue').textContent = formatCurrency(totalValue);
+            document.getElementById('totalInvestment').textContent = formatCurrency(totalInvestment);
+
+            const profitElement = document.getElementById('totalProfit');
+            profitElement.textContent = formatCurrency(totalProfit);
+            profitElement.className = `stat-value ${totalProfit >= 0 ? 'profit-positive' : 'profit-negative'}`;
+        }
+
+        function renderPortfolio() {
+            const container = document.getElementById('portfolioContent');
+            if (portfolioData.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-portfolio">
+                        <i class="fas fa-chart-pie"></i>
+                        <h4>Tu portafolio está vacío</h4>
+                        <p>Comienza agregando tus primeros activos o criptomonedas</p>
+                    </div>
+                `;
+                return;
+            }
+            let tableHTML = `
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Ticker</th>
+                                <th>Cantidad</th>
+                                <th>Precio Compra</th>
+                                <th>Precio Actual</th>
+                                <th>Valor</th>
+                                <th>Ganancia/Pérdida</th>
+                                <th>Divisa</th>
+                                <th>Detalle</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            portfolioData.forEach(asset => {
+                const profitClass = asset.profit >= 0 ? 'profit-positive' : 'profit-negative';
+                const icon = asset.type === 'crypto' ? 'fab fa-bitcoin' : 'fas fa-chart-line';
+                tableHTML += `
+                    <tr>
+                        <td>
+                            <i class="${icon} me-2"></i>
+                            ${asset.name}
+                        </td>
+                        <td>${asset.ticker}</td>
+                        <td>${asset.quantity}</td>
+                        <td>${formatCurrency(asset.purchase_price)}</td>
+                        <td>${formatCurrency(asset.current_price)}</td>
+                        <td>${formatCurrency(asset.value)}</td>
+                        <td class="${profitClass}">${formatCurrency(asset.profit)}</td>
+                        <td>${asset.currency || 'USD'}</td>
+                        <td>
+  <button class="btn btn-info btn-sm" onclick="viewDetails(${asset.id})">
+    Ver Detalle
+  </button>
+</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm me-1" onclick="editAsset(${asset.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteAsset(${asset.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            tableHTML += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            container.innerHTML = tableHTML;
+        }
+
+        function addAsset(formData) {
+            const newAsset = {
+                id: Date.now(),
+                name: formData.name,
+                ticker: formData.ticker || 'N/A',
+                type: 'stock',
+                quantity: parseFloat(formData.quantity),
+                purchase_price: parseFloat(formData.purchase_price),
+                current_price: parseFloat(formData.purchase_price),
+                currency: formData.currency || 'USD',
+                purchase_date: formData.purchase_date || '',
+                notes: formData.notes || '',
+                commission: parseFloat(formData.commission) || 0,
+                broker: formData.broker || '',
+                value: 0,
+                profit: 0
+            };
+            newAsset.value = newAsset.quantity * newAsset.current_price;
+            newAsset.profit = newAsset.value - (newAsset.quantity * newAsset.purchase_price) - newAsset.commission;
+            portfolioData.push(newAsset);
+            savePortfolio();
+            updateStats();
+            renderPortfolio();
+            showAlert('Activo agregado exitosamente', 'success');
+        }
+
+        function addCrypto(formData) {
+            const [cryptoId, ticker] = formData.crypto_name.split(',');
+            const newCrypto = {
+                id: Date.now(),
+                name: cryptoId.charAt(0).toUpperCase() + cryptoId.slice(1),
+                ticker: ticker?.trim() || cryptoId.toUpperCase(),
+                type: 'crypto',
+                quantity: parseFloat(formData.crypto_quantity),
+                purchase_price: parseFloat(formData.crypto_purchase_price),
+                current_price: parseFloat(formData.crypto_purchase_price),
+                currency: formData.crypto_currency || 'USD',
+                purchase_date: formData.crypto_purchase_date || '',
+                notes: formData.crypto_notes || '',
+                commission: parseFloat(formData.crypto_commission) || 0,
+                broker: formData.crypto_broker || '',
+                value: 0,
+                profit: 0
+            };
+            newCrypto.value = newCrypto.quantity * newCrypto.current_price;
+            newCrypto.profit = newCrypto.value - (newCrypto.quantity * newCrypto.purchase_price) - newCrypto.commission;
+            portfolioData.push(newCrypto);
+            savePortfolio();
+            updateStats();
+            renderPortfolio();
+            showAlert('Criptomoneda agregada exitosamente', 'success');
+        }
+
+        function editAsset(id) {
+            const asset = portfolioData.find(item => item.id === id);
+            if (!asset) return;
+            document.getElementById('editAssetId').value = asset.id;
+            document.getElementById('editName').value = asset.name;
+            document.getElementById('editQuantity').value = asset.quantity;
+            document.getElementById('editPurchasePrice').value = asset.purchase_price;
+            const modal = new bootstrap.Modal(document.getElementById('editModal'));
+            modal.show();
+        }
+
+        function saveEdit() {
+            const id = parseInt(document.getElementById('editAssetId').value);
+            const asset = portfolioData.find(item => item.id === id);
+            if (!asset) return;
+            asset.name = document.getElementById('editName').value;
+            asset.quantity = parseFloat(document.getElementById('editQuantity').value);
+            asset.purchase_price = parseFloat(document.getElementById('editPurchasePrice').value);
+            asset.value = asset.quantity * asset.current_price;
+            asset.profit = asset.value - (asset.quantity * asset.purchase_price);
+            savePortfolio();
+            updateStats();
+            renderPortfolio();
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
+            modal.hide();
+            showAlert('Activo actualizado exitosamente', 'success');
+        }
+
+        function deleteAsset(id) {
+            if (confirm('¿Estás seguro de que deseas eliminar este activo?')) {
+                portfolioData = portfolioData.filter(item => item.id !== id);
+                savePortfolio();
+                updateStats();
+                renderPortfolio();
+                showAlert('Activo eliminado exitosamente', 'warning');
+            }
+        }
+
+        function refreshPortfolio() {
+            showAlert('No hay conexión a precios en tiempo real en modo local.', 'info');
+        }
+
+        function viewDetails(id) {
+            const asset = portfolioData.find(item => item.id === id);
+            if (!asset) return;
+            let detailsHTML = `
+                <div class="mb-3">
+                    <strong>Nombre:</strong> ${asset.name}
+                </div>
+                <div class="mb-3">
+                    <strong>Ticker:</strong> ${asset.ticker}
+                </div>
+                <div class="mb-3">
+                    <strong>Cantidad:</strong> ${asset.quantity}
+                </div>
+                <div class="mb-3">
+                    <strong>Precio de Compra:</strong> ${formatCurrency(asset.purchase_price)}
+                </div>
+                <div class="mb-3">
+                    <strong>Precio Actual:</strong> ${formatCurrency(asset.current_price)}
+                </div>
+                <div class="mb-3">
+                    <strong>Valor:</strong> ${formatCurrency(asset.value)}
+                </div>
+                <div class="mb-3">
+                    <strong>Ganancia/Pérdida:</strong> ${formatCurrency(asset.profit)}
+                </div>
+                <div class="mb-3">
+                    <strong>Divisa:</strong> ${asset.currency || 'USD'}
+                </div>
+                <div class="mb-3">
+                    <strong>Fecha de Compra:</strong> ${asset.purchase_date || 'N/A'}
+                </div>
+                <div class="mb-3">
+                    <strong>Notas:</strong> ${asset.notes || 'N/A'}
+                </div>
+                <div class="mb-3">
+                    <strong>Comisión:</strong> ${asset.commission ? formatCurrency(asset.commission) : formatCurrency(0)}
+                </div>
+                <div class="mb-3">
+                    <strong>Broker:</strong> ${asset.broker || 'N/A'}
+                </div>
+            `;
+            const modal = new bootstrap.Modal(document.getElementById('viewDetailsModal'));
+            document.getElementById('viewDetailsContent').innerHTML = detailsHTML;
+            modal.show();
+        }
+
+        // Event Listeners
+        document.getElementById('addAssetForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+            addAsset(data);
+            this.reset();
+        });
+
+        document.getElementById('addCryptoForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+            addCrypto(data);
+            this.reset();
+        });
+
+        document.getElementById('saveEditBtn').addEventListener('click', saveEdit);
+
+        document.getElementById('refreshBtn').addEventListener('click', refreshPortfolio);
+
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+                showAlert('Cerrando sesión...', 'info');
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 1000);
+            }
+        });
+
+        // Cambiar entre modo claro y oscuro y guardar preferencia
+        const toggleThemeBtn = document.getElementById('toggleThemeBtn');
+        toggleThemeBtn.addEventListener('click', function() {
+            const isDarkMode = document.body.classList.toggle('dark-mode');
+            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+            toggleThemeBtn.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+            showAlert(isDarkMode ? 'Modo oscuro activado' : 'Modo claro activado', 'info');
+        });
+
+        document.getElementById('toggleDetailsAsset').addEventListener('click', function() {
+    const details = document.getElementById('assetDetails');
+    details.style.display = details.style.display === 'none' ? 'block' : 'none';
+});
+document.getElementById('toggleDetailsCrypto').addEventListener('click', function() {
+    const details = document.getElementById('cryptoDetails');
+    details.style.display = details.style.display === 'none' ? 'block' : 'none';
+});
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleThemeBtn = document.getElementById('toggleThemeBtn');
+            function setThemeIcon() {
+                if (document.body.classList.contains('dark-mode')) {
+                    toggleThemeBtn.innerHTML = '<i class="fas fa-sun"></i>';
+                } else {
+                    toggleThemeBtn.innerHTML = '<i class="fas fa-moon"></i>';
+                }
+            }
+            // Aplica el modo guardado
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark-mode');
+            }
+            setThemeIcon();
+
+            toggleThemeBtn.addEventListener('click', function() {
+                const isDarkMode = document.body.classList.toggle('dark-mode');
+                localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+                setThemeIcon();
+                showAlert(isDarkMode ? 'Modo oscuro activado' : 'Modo claro activado', 'info');
+            });
+
+            // Botón cerrar sesión: redirige a inicio.html
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+                    showAlert('Cerrando sesión...', 'info');
+                    setTimeout(() => {
+                        window.location.href = "http://127.0.0.1:5500/trackyfi/templates/inicio.html";
+                    }, 1000);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
