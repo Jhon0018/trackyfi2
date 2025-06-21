@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mi Perfil - TrackYfi</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="home.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #e0e7ef 100%);
+            min-height: 100vh;
+        }
+        .profile-container {
+            max-width: 900px;
+            margin: 60px auto 0 auto;
+            background: rgba(255,255,255,0.95);
+            border-radius: 2rem;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.08);
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .profile-sidebar {
+            background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+            color: #fff;
+            flex: 1 1 260px;
+            min-width: 260px;
+            max-width: 320px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 3rem 1.5rem 2rem 1.5rem;
+        }
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid #fff;
+            background: #fff;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+        }
+        .profile-username {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #fff;
+        }
+        .profile-email {
+            font-size: 1rem;
+            color: #cbd5e1;
+            margin-bottom: 1.5rem;
+            word-break: break-all;
+        }
+        .profile-actions {
+            margin-top: auto;
+            width: 100%;
+        }
+        .profile-actions a {
+            width: 100%;
+        }
+        .profile-main {
+            flex: 2 1 400px;
+            padding: 3rem 2.5rem 2.5rem 2.5rem;
+            background: transparent;
+        }
+        .profile-section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 1.5rem;
+            letter-spacing: 1px;
+        }
+        .profile-info-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 2rem 0;
+        }
+        .profile-info-list li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.2rem;
+        }
+        .profile-info-icon {
+            font-size: 1.3rem;
+            color: #0ea5e9;
+            width: 36px;
+            text-align: center;
+        }
+        .profile-label {
+            font-weight: 600;
+            color: #334155;
+            min-width: 120px;
+        }
+        .profile-value {
+            font-size: 1.1rem;
+            color: #222;
+            margin-left: 10px;
+        }
+        .profile-stats {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        .profile-stat-card {
+            flex: 1;
+            background: #f1f5f9;
+            border-radius: 1rem;
+            padding: 1.2rem 1rem;
+            text-align: center;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+        }
+        .profile-stat-value {
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: #0ea5e9;
+        }
+        .profile-stat-label {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+        @media (max-width: 900px) {
+            .profile-container {
+                flex-direction: column;
+            }
+            .profile-sidebar, .profile-main {
+                max-width: 100%;
+                flex: 1 1 100%;
+            }
+            .profile-main {
+                padding: 2rem 1rem;
+            }
+        }
+        body.dark-mode .profile-container {
+            background: #18181b !important;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+        }
+        body.dark-mode .profile-sidebar {
+            background: linear-gradient(135deg, #22223b 0%, #232946 100%);
+            color: #fff;
+        }
+        body.dark-mode .profile-main {
+            background: transparent;
+        }
+        body.dark-mode .profile-section-title,
+        body.dark-mode .profile-label {
+            color: #fff !important;
+        }
+        body.dark-mode .profile-value {
+            color: #e0e7ef !important;
+        }
+        body.dark-mode .profile-stat-card {
+            background: #232946 !important;
+            color: #fff !important;
+        }
+        body.dark-mode .profile-stat-label {
+            color: #cbd5e1 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-container">
+        <!-- Sidebar -->
+        <div class="profile-sidebar">
+            <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Foto de perfil" class="profile-avatar" id="profilePhoto">
+            <div class="profile-username" id="profileName">Nombre</div>
+            <div class="profile-email" id="profileEmail">correo@email.com</div>
+            <div class="profile-actions mt-4">
+                <a href="home.html" class="btn btn-outline-light mb-2 w-100">
+                    <i class="fas fa-arrow-left me-2"></i>Volver al Dashboard
+                </a>
+            </div>
+        </div>
+        <!-- Main -->
+        <div class="profile-main">
+            <div class="profile-section-title"><i class="fas fa-id-card me-2"></i>Información Personal</div>
+            <ul class="profile-info-list">
+                <li>
+                    <span class="profile-info-icon"><i class="fas fa-user"></i></span>
+                    <span class="profile-label">Nombre:</span>
+                    <span class="profile-value" id="profileNameMain">-</span>
+                </li>
+                <li>
+                    <span class="profile-info-icon"><i class="fas fa-flag"></i></span>
+                    <span class="profile-label">País:</span>
+                    <span class="profile-value" id="profileCountry">-</span>
+                </li>
+                <li>
+                    <span class="profile-info-icon"><i class="fas fa-birthday-cake"></i></span>
+                    <span class="profile-label">Edad:</span>
+                    <span class="profile-value" id="profileAge">-</span>
+                </li>
+                <li>
+                    <span class="profile-info-icon"><i class="fas fa-calendar-alt"></i></span>
+                    <span class="profile-label">Fecha de registro:</span>
+                    <span class="profile-value" id="profileCreated">-</span>
+                </li>
+            </ul>
+            <div class="profile-section-title"><i class="fas fa-chart-bar me-2"></i>Estadísticas rápidas</div>
+            <div class="profile-stats">
+                <div class="profile-stat-card">
+                    <div class="profile-stat-value" id="statAssets">-</div>
+                    <div class="profile-stat-label">Activos registrados</div>
+                </div>
+                <div class="profile-stat-card">
+                    <div class="profile-stat-value" id="statCryptos">-</div>
+                    <div class="profile-stat-label">Criptos registradas</div>
+                </div>
+                <div class="profile-stat-card">
+                    <div class="profile-stat-value" id="statSince">-</div>
+                    <div class="profile-stat-label">Días en TrackYfi</div>
+                </div>
+            </div>
+            <div id="profileAlert" class="mt-3"></div>
+        </div>
+    </div>
+    <!-- Firebase y lógica de perfil -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
+        import { getFirestore, doc, getDoc, collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
+
+        // Configuración Firebase (igual que en index.html)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBj0vG5CgWxEBrvkNBMvMU9TFcKuqLP0cc",
+            authDomain: "trackyfi-317e1.firebaseapp.com",
+            projectId: "trackyfi-317e1",
+            storageBucket: "trackyfi-317e1.appspot.com",
+            messagingSenderId: "843779589124",
+            appId: "1:843779589124:web:d782b98668b1c16ce0a151",
+            measurementId: "G-9DQCFXXND3"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Elementos del DOM
+        const profileEmail = document.getElementById('profileEmail');
+        const profileName = document.getElementById('profileName');
+        const profileNameMain = document.getElementById('profileNameMain');
+        const profileCountry = document.getElementById('profileCountry');
+        const profileAge = document.getElementById('profileAge');
+        const profileCreated = document.getElementById('profileCreated');
+        const profileAlert = document.getElementById('profileAlert');
+        const profilePhoto = document.getElementById('profilePhoto');
+        const statAssets = document.getElementById('statAssets');
+        const statCryptos = document.getElementById('statCryptos');
+        const statSince = document.getElementById('statSince');
+
+        function showProfileAlert(message, type = 'danger') {
+            profileAlert.innerHTML = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+        }
+
+        // Cargar datos del usuario autenticado y estadísticas
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                showProfileAlert('Debes iniciar sesión para ver tu perfil.');
+                setTimeout(() => window.location.href = "index.html", 2000);
+                return;
+            }
+            profileEmail.textContent = user.email;
+
+            // Foto de perfil (si algún día usas Google o subidas, aquí puedes cambiar la lógica)
+            if (user.photoURL) {
+                profilePhoto.src = user.photoURL;
+            }
+
+            // Traer datos de Firestore
+            const userRef = doc(db, "users", user.uid);
+            const userSnap = await getDoc(userRef);
+            let createdDate = null;
+            if (userSnap.exists()) {
+                const data = userSnap.data();
+                profileName.textContent = data.nombre || 'Sin nombre';
+                profileNameMain.textContent = data.nombre || 'Sin nombre';
+                profileCountry.textContent = data.pais || 'No especificado';
+                profileAge.textContent = data.edad || 'No especificada';
+                if (data.creado && data.creado.toDate) {
+                    createdDate = data.creado.toDate();
+                    profileCreated.textContent = createdDate.toLocaleString();
+                } else if (data.creado && typeof data.creado === 'object' && data.creado.seconds) {
+                    createdDate = new Date(data.creado.seconds * 1000);
+                    profileCreated.textContent = createdDate.toLocaleString();
+                } else if (data.creado) {
+                    createdDate = new Date(data.creado);
+                    profileCreated.textContent = createdDate.toLocaleString();
+                } else {
+                    profileCreated.textContent = '';
+                }
+            } else {
+                profileName.textContent = 'Sin nombre';
+                profileNameMain.textContent = 'Sin nombre';
+                profileCountry.textContent = 'No especificado';
+                profileAge.textContent = 'No especificada';
+                profileCreated.textContent = '';
+            }
+
+            // Estadísticas rápidas
+            // Activos y criptos: busca en la colección "portfolio" si la tienes, si no, usa localStorage como fallback
+            let assets = 0, cryptos = 0;
+            try {
+                // Si tienes una colección "portfolio" por usuario:
+                const portfolioRef = collection(db, "portfolio");
+                const q = query(portfolioRef, where("userId", "==", user.uid));
+                const querySnapshot = await getDocs(q);
+                querySnapshot.forEach(docSnap => {
+                    const item = docSnap.data();
+                    if (item.type === "crypto") cryptos++;
+                    else assets++;
+                });
+            } catch (e) {
+                // Fallback: intenta leer del localStorage si no hay Firestore
+                try {
+                    const data = JSON.parse(localStorage.getItem('portfolioData') || '[]');
+                    data.forEach(item => {
+                        if (item.type === "crypto") cryptos++;
+                        else assets++;
+                    });
+                } catch {}
+            }
+            statAssets.textContent = assets;
+            statCryptos.textContent = cryptos;
+
+            // Días en TrackYfi
+            if (createdDate) {
+                const now = new Date();
+                const diff = Math.floor((now - createdDate) / (1000 * 60 * 60 * 24));
+                statSince.textContent = diff >= 0 ? diff : '-';
+            } else {
+                statSince.textContent = '-';
+            }
+        });
+    </script>
+</body>
+</html>
