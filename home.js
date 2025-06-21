@@ -17,6 +17,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 let currentUserId = null;
+// Suponiendo que tienes un array portfolioData en localStorage:
 let portfolioData = JSON.parse(localStorage.getItem('portfolioData') || '[]');
 let profitPieChart, profitBarChart;
 
@@ -58,6 +59,76 @@ function updateStats() {
 }
 
 // Gráficas
+function getProfitChartData() {
+    const labels = [];
+    const profits = [];
+    const colors = [];
+
+    portfolioData.forEach(asset => {
+        labels.push(asset.name + (asset.ticker ? ` (${asset.ticker})` : ''));
+        // Ganancia/pérdida = valor actual - (cantidad * precio compra) - comisión
+        const profit = (asset.value || (asset.quantity * asset.current_price)) - (asset.quantity * asset.purchase_price) - (asset.commission || 0);
+        profits.push(profit);
+        colors.push(profit >= 0 ? '#22c55e' : '#ef4444');
+    });
+
+    return { labels, profits, colors };
+}
+
+// Renderiza la gráfica de pastel y barras
+function renderProfitCharts() {
+    const { labels, profits, colors } = getProfitChartData();
+
+    // Pie Chart
+    const pieCtx = document.getElementById('profitPieChart').getContext('2d');
+    if (window.profitPieChart) window.profitPieChart.destroy();
+    window.profitPieChart = new Chart(pieCtx, {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: profits,
+                backgroundColor: colors,
+            }]
+        },
+        options: {
+            plugins: {
+                legend: { display: true }
+            }
+        }
+    });
+
+    // Bar Chart
+    const barCtx = document.getElementById('profitBarChart').getContext('2d');
+    if (window.profitBarChart) window.profitBarChart.destroy();
+    window.profitBarChart = new Chart(barCtx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Ganancia/Pérdida',
+                data: profits,
+                backgroundColor: colors,
+            }]
+        },
+        options: {
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + value.toLocaleString();
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
 function renderCharts() {
     if (!window.Chart) return;
     const labels = portfolioData.map(item => item.name + (item.ticker ? ` (${item.ticker})` : ''));
@@ -386,15 +457,9 @@ document.getElementById('toggleCryptoForm').addEventListener('click', function()
     form.style.display = form.style.display === 'none' ? 'block' : 'none';
 });
 
-// Modo oscuro
-const toggleThemeBtn = document.getElementById('toggleThemeBtn');
-toggleThemeBtn.addEventListener('click', function() {
-    const isDarkMode = document.body.classList.toggle('dark-mode');
-    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
-    toggleThemeBtn.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-    showAlert(isDarkMode ? 'Modo oscuro activado' : 'Modo claro activado', 'info');
-});
+
 document.addEventListener('DOMContentLoaded', function() {
+    const toggleThemeBtn = document.getElementById('toggleThemeBtn');
     function setThemeIcon() {
         if (document.body.classList.contains('dark-mode')) {
             toggleThemeBtn.innerHTML = '<i class="fas fa-sun"></i>';
@@ -402,15 +467,19 @@ document.addEventListener('DOMContentLoaded', function() {
             toggleThemeBtn.innerHTML = '<i class="fas fa-moon"></i>';
         }
     }
+    // Aplica el modo guardado
     if (localStorage.getItem('theme') === 'dark') {
         document.body.classList.add('dark-mode');
     }
     setThemeIcon();
+
     toggleThemeBtn.addEventListener('click', function() {
         const isDarkMode = document.body.classList.toggle('dark-mode');
         localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
         setThemeIcon();
-        showAlert(isDarkMode ? 'Modo oscuro activado' : 'Modo claro activado', 'info');
+        if (typeof showAlert === "function") {
+            showAlert(isDarkMode ? 'Modo oscuro activado' : 'Modo claro activado', 'info');
+        }
     });
 });
 
@@ -452,3 +521,5 @@ onAuthStateChanged(auth, (user) => {
 // Inicialización
 updateStats();
 renderPortfolio();
+renderProfitCharts();
+
