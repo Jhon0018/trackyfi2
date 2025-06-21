@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>TrackYfi - Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <!-- Barra lateral izquierda -->
+    <div id="sidebar" class="d-flex flex-column flex-shrink-0 p-3 bg-light border-end position-fixed" style="width: 220px; height: 100vh; z-index: 1040;">
+        <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
+            <span class="fs-4"><i class="fas fa-chart-pie me-2"></i>TrackYfi</span>
+        </a>
+        <hr>
+        <ul class="nav nav-pills flex-column mb-auto">
+            <li class="nav-item">
+                <a href="home.html" class="nav-link active" aria-current="page">
+                    <i class="fas fa-home me-2"></i> Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="perfil.html" class="nav-link text-dark">
+                    <i class="fas fa-user me-2"></i> Perfil
+                </a>
+            </li>
+            <li>
+                <a href="#" class="nav-link text-dark">
+                    <i class="fas fa-cog me-2"></i> Configuración
+                </a>
+            </li>
+            <li>
+                <a href="#" class="nav-link text-dark">
+                    <i class="fas fa-question-circle me-2"></i> Ayuda
+                </a>
+            </li>
+        </ul>
+        <hr>
+        <div>
+            <!-- Botón de cerrar sesión eliminado -->
+        </div>
+    </div>
+
+    <!-- Contenido principal (ajustado con margen izquierdo) -->
+    <div style="margin-left:220px;">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg fixed-top">
+            <div class="container">
+                <a class="navbar-brand" href="/">
+                    <i class="fas fa-chart-pie me-2"></i>TrackYfi
+                </a>
+                <div class="navbar-nav ms-auto">
+                    <span class="navbar-text me-3" id="userEmail"></span>
+                    <a href="index.html" class="btn btn-outline-dark me-2">Inicio</a>
+                    <!-- Botón de cerrar sesión eliminado -->
+                    <button class="btn btn-outline-dark ms-2" id="toggleThemeBtn" title="Cambiar modo blanco/negro">
+                        <i class="fas fa-adjust"></i>
+                    </button>
+                    <!-- Botón para abrir el menú lateral -->
+                    <button class="btn btn-outline-dark ms-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu" aria-controls="sideMenu" title="Menú">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Menú lateral derecho -->
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="sideMenu" aria-labelledby="sideMenuLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="sideMenuLabel">Menú</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+          </div>
+          <div class="offcanvas-body">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item bg-transparent"><a href="/" class="text-decoration-none text-dark">Inicio</a></li>
+              <li class="list-group-item bg-transparent"><a href="index.html" class="text-decoration-none text-dark">Dashboard</a></li>
+              <li class="list-group-item bg-transparent"><a href="#" class="text-decoration-none text-dark">Perfil</a></li>
+              <li class="list-group-item bg-transparent"><a href="#" class="text-decoration-none text-dark">Configuración</a></li>
+              <li class="list-group-item bg-transparent"><a href="#" class="text-decoration-none text-dark">Ayuda</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="dashboard-container">
+            <div class="container">
+                <!-- Alertas -->
+                <div id="alertsContainer"></div>
+
+                <!-- Estadísticas -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="stats-card">
+                            <div class="stat-value" id="totalValue">$0.00</div>
+                            <div class="stat-label">Valor Total</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stats-card">
+                            <div class="stat-value" id="totalInvestment">$0.00</div>
+                            <div class="stat-label">Inversión Total</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stats-card">
+                            <div class="stat-value" id="totalProfit">$0.00</div>
+                            <div class="stat-label">Ganancia/Pérdida</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formularios de Agregar Assets -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header d-flex align-items-center" style="cursor:pointer;" id="toggleAssetForm">
+                                <i class="fas fa-plus-circle me-2"></i>
+                                <span>Agregar Activo</span>
+                            </div>
+                            <div class="card-body p-0" id="assetFormContainer" style="display:none;">
+                                <!-- Formulario de agregar activo -->
+    <form id="addAssetForm" class="p-3">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="name" class="form-label">Nombre</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="ticker" class="form-label">Ticker</label>
+                <input type="text" class="form-control" id="ticker" name="ticker">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="isin" class="form-label">ISIN</label>
+                <input type="text" class="form-control" id="isin" name="isin">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="quantity" class="form-label">Cantidad</label>
+                <input type="number" step="0.01" class="form-control" id="quantity" name="quantity" required>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label for="purchase_price" class="form-label">Precio de Compra</label>
+            <input type="number" step="0.01" class="form-control" id="purchase_price" name="purchase_price" required>
+        </div>
+        <div class="mb-3">
+            <label for="currency" class="form-label">Divisa</label>
+            <select class="form-control" id="currency" name="currency">
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="COP">COP</option>
+                <option value="MXN">MXN</option>
+            </select>
+        </div>
+        <button type="button" class="btn btn-outline-dark mb-2" id="toggleDetailsAsset">+ Más Detalle</button>
+        <div id="assetDetails" style="display:none;">
+            <div class="mb-3">
+                <label for="purchase_date" class="form-label">Fecha de compra</label>
+                <input type="date" class="form-control" id="purchase_date" name="purchase_date">
+            </div>
+            <div class="mb-3">
+                <label for="notes" class="form-label">Notas o Comentarios</label>
+                <textarea class="form-control" id="notes" name="notes"></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="commission" class="form-label">Comisión</label>
+                <input type="number" step="0.01" class="form-control" id="commission" name="commission">
+            </div>
+            <div class="mb-3">
+                <label for="broker" class="form-label">Broker / Plataforma</label>
+                <input type="text" class="form-control" id="broker" name="broker">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-custom w-100">
+            <i class="fas fa-plus me-2"></i>Agregar Activo
+        </button>
+    </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header d-flex align-items-center" style="cursor:pointer;" id="toggleCryptoForm">
+                                <i class="fab fa-bitcoin me-2"></i>
+                                <span>Agregar Criptomoneda</span>
+                            </div>
+                            <div class="card-body p-0" id="cryptoFormContainer" style="display:none;">
+                                <!-- Formulario de agregar cripto -->
+<form id="addCryptoForm" class="p-3">
+    <div class="mb-3">
+        <label for="crypto_name" class="form-label">Criptomoneda</label>
+        <input type="text" class="form-control" id="crypto_name" name="crypto_name" placeholder="bitcoin,BTC" required>
+        <div class="form-text text-muted">Formato: id_coingecko,TICKER</div>
+    </div>
+    <div class="mb-3">
+        <label for="crypto_quantity" class="form-label">Cantidad</label>
+        <input type="number" step="0.00000001" class="form-control" id="crypto_quantity" name="crypto_quantity" required>
+    </div>
+    <div class="mb-3">
+        <label for="crypto_purchase_price" class="form-label">Precio de Compra</label>
+        <input type="number" step="0.01" class="form-control" id="crypto_purchase_price" name="crypto_purchase_price" required>
+    </div>
+    <div class="mb-3">
+        <label for="crypto_currency" class="form-label">Divisa</label>
+        <select class="form-control" id="crypto_currency" name="crypto_currency">
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+            <option value="COP">COP</option>
+            <option value="MXN">MXN</option>
+        </select>
+    </div>
+    <button type="button" class="btn btn-outline-dark mb-2" id="toggleDetailsCrypto">+ Más Detalle</button>
+    <div id="cryptoDetails" style="display:none;">
+        <div class="mb-3">
+            <label for="crypto_purchase_date" class="form-label">Fecha de compra</label>
+            <input type="date" class="form-control" id="crypto_purchase_date" name="crypto_purchase_date">
+        </div>
+        <div class="mb-3">
+            <label for="crypto_notes" class="form-label">Notas o Comentarios</label>
+            <textarea class="form-control" id="crypto_notes" name="crypto_notes"></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="crypto_commission" class="form-label">Comisión</label>
+            <input type="number" step="0.01" class="form-control" id="crypto_commission" name="crypto_commission">
+        </div>
+        <div class="mb-3">
+            <label for="crypto_broker" class="form-label">Broker / Plataforma</label>
+            <input type="text" class="form-control" id="crypto_broker" name="crypto_broker">
+        </div>
+    </div>
+    <button type="submit" class="btn btn-success w-100">
+        <i class="fab fa-bitcoin me-2"></i>Agregar Cripto
+    </button>
+</form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabla de Portafolio -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-chart-line me-2"></i>Mi Portafolio
+                        <button class="btn btn-sm btn-outline-dark float-end" id="refreshBtn">
+                            <i class="fas fa-sync-alt me-1"></i>Actualizar
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="portfolioContent">
+                            <div class="empty-portfolio">
+                                <i class="fas fa-chart-pie"></i>
+                                <h4>Tu portafolio está vacío</h4>
+                                <p>Comienza agregando tus primeros activos o criptomonedas</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráficas de Ganancias/Pérdidas -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <i class="fas fa-chart-pie me-2"></i>Gráficas de Ganancias/Pérdidas
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <canvas id="profitPieChart"></canvas>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <canvas id="profitBarChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal para editar activo -->
+        <div class="modal fade" id="editModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content bg-white dark-mode">
+                    <div class="modal-header border-secondary">
+                        <h5 class="modal-title">Editar Activo</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editAssetForm">
+                            <input type="hidden" id="editAssetId">
+                            <div class="mb-3">
+                                <label for="editName" class="form-label">Nombre</label>
+                                <input type="text" class="form-control" id="editName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editQuantity" class="form-label">Cantidad</label>
+                                <input type="number" step="0.00000001" class="form-control" id="editQuantity" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editPurchasePrice" class="form-label">Precio de Compra</label>
+                                <input type="number" step="0.01" class="form-control" id="editPurchasePrice" required>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer border-secondary">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-custom" id="saveEditBtn">Guardar Cambios</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal para ver detalles -->
+        <div class="modal fade" id="viewDetailsModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content bg-white dark-mode">
+                    <div class="modal-header border-secondary">
+                        <h5 class="modal-title">Detalles del Activo</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body" id="viewDetailsContent">
+                    </div>
+                    <div class="modal-footer border-secondary">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bootstrap 5 JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Chart.js para gráficas -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="module" src="home.js"></script>
+    </div>
+</body>
+</html>
