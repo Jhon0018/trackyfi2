@@ -404,3 +404,13 @@ body.dark-mode #sideMenu.offcanvas .btn {
     color: #fff !important;
     border-color: #fff !important;
 }
+
+/* Agrega esto al final del archivo para personalizar la imagen de portada */
+/* Haz la imagen de portada más grande */
+.portada-img {
+    border-radius: 0;
+    box-shadow: none;
+    max-width: 900px;
+    width: 100%;
+    height: auto;
+}
