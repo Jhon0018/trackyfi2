@@ -113,8 +113,11 @@ body {
     padding: 2rem 0 2rem 0;
     background: transparent;
     min-height: 100vh;
-    margin-left: 220px;
-    transition: background 0.4s;
+    margin-left: 240px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;    /* Centra horizontalmente el contenido */
+    transition: background 0.4s, margin-left 0.3s;
 }
 .stats-card {
     background: #fff;
@@ -140,10 +143,12 @@ body {
     transition: color 0.3s;
 }
 .profit-positive {
-    color: #222 !important;
+    color: #198754 !important; /* verde Bootstrap */
+    font-weight: bold;
 }
 .profit-negative {
-    color: #ef4444 !important;
+    color: #ef4444 !important; /* rojo */
+    font-weight: bold;
 }
 
 /* --------- TABLAS --------- */
@@ -153,6 +158,10 @@ body {
     border-radius: 1rem;
     overflow: hidden;
     transition: background 0.4s, color 0.3s;
+}
+.table td, .table th {
+    color: #18181b !important;
+    background: #fff !important;
 }
 .table th, .table td {
     border-color: #e5e7eb !important;
@@ -197,9 +206,14 @@ body {
     transition: color 0.3s;
 }
 .form-label {
-    color: #555;
+    color: #000000;
     font-weight: 500;
     transition: color 0.3s;
+}
+
+/* En modo oscuro, las .form-label serán blancas */
+body.dark-mode .form-label {
+    color: #040404 !important;
 }
 
 /* --------- ALERTAS --------- */
@@ -290,48 +304,46 @@ body.dark-mode .stat-label {
 body.dark-mode .table,
 body.dark-mode .table-striped,
 body.dark-mode .table-responsive {
-    background: transparent !important;
-    color: #f3f4f6 !important;
-}
-body.dark-mode th,
-body.dark-mode td {
-    background: transparent !important;
-    color: #f3f4f6 !important;
-    border-color: #444 !important;
-}
-body.dark-mode tr {
-    border-color: #444 !important;
-}
-body.dark-mode tr:nth-child(even) {
     background: #23232a !important;
+    color: #fff !important;
 }
-body.dark-mode tr:hover {
+body.dark-mode .table th,
+body.dark-mode .table td {
+    background: #23232a !important;
+    color: #fff !important;
+    border-color: #444 !important;
+}
+body.dark-mode .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: #1a1a22 !important;
+}
+body.dark-mode .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: #23232a !important;
+}
+body.dark-mode .table-striped > tbody > tr:hover {
+    background-color: #33334d !important;
+    color: #fff !important;
+}
+body.dark-mode .profit-positive {
+    color: #4ade80 !important; /* verde claro */
+    font-weight: bold;
+}
+body.dark-mode .profit-negative {
+    color: #ef4444 !important;
+    font-weight: bold;
+}
+
+/* Mejor contraste para botones dentro de la tabla en modo oscuro */
+body.dark-mode .table .btn,
+body.dark-mode .table .btn-sm {
+    background: #18181b !important;
+    color: #fff !important;
+    border-color: #444 !important;
+}
+body.dark-mode .table .btn:hover,
+body.dark-mode .table .btn-sm:hover {
     background: #fff !important;
     color: #18181b !important;
-}
-body.dark-mode .form-control {
-    background: #18181b !important;
-    border: 1.5px solid #fff !important;
-    color: #f3f4f6 !important;
-}
-body.dark-mode .form-control::placeholder {
-    color: #fff !important;
-    opacity: 0.7;
-}
-body.dark-mode .alert {
-    background: #23232a !important;
-    border: 1.5px solid #fff !important;
-    color: #fff !important;
-}
-body.dark-mode .alert-success {
-    background: #23232a !important;
-    border: 1.5px solid #fff !important;
-    color: #f3f4f6 !important;
-}
-body.dark-mode .alert-danger {
-    background: rgba(239,68,68,0.08) !important;
-    border: 1.5px solid #ef4444 !important;
-    color: #f3f4f6 !important;
+    border-color: #fff !important;
 }
 
 /* --------- SCROLLBAR PERSONALIZADO --------- */
@@ -373,6 +385,10 @@ body.dark-mode a:hover {
     .dashboard-container {
         padding: 1rem 0 1rem 0;
         margin-left: 0 !important;
+        align-items: stretch;
+    }
+    .dashboard-container > .container {
+        max-width: 100%;
     }
     .navbar-nav {
         flex-wrap: wrap;
@@ -387,4 +403,161 @@ body.dark-mode a:hover {
         font-size: 1rem;
         justify-content: flex-start;
     }
+}
+
+/* Centra la tabla del portafolio y su contenido */
+.dashboard-container > .table-responsive,
+.dashboard-container > .table,
+.dashboard-container table {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.dashboard-container {
+    align-items: center;
+    justify-content: center;
+}
+
+.dashboard-container .table {
+    width: 90%;
+    max-width: 1000px;
+    margin: 0 auto 2rem auto;
+    text-align: center;
+}
+
+.dashboard-container .table th,
+.dashboard-container .table td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* En responsive, que la tabla ocupe todo el ancho */
+@media (max-width: 991px) {
+    .dashboard-container .table {
+        width: 100%;
+        min-width: 320px;
+    }
+}
+
+/* Letras y números blancos en modo oscuro, excepto ganancias/pérdidas */
+body.dark-mode .table td,
+body.dark-mode .table th,
+body.dark-mode .stat-value,
+body.dark-mode .stat-label {
+    color: #fff !important;
+}
+
+/* Ganancia en verde y pérdida en rojo en modo oscuro */
+body.dark-mode .profit-positive {
+    color: #4ade80 !important;   /* verde claro */
+    font-weight: bold;
+}
+body.dark-mode .profit-negative {
+    color: #ef4444 !important;   /* rojo */
+    font-weight: bold;
+}
+
+/* Si quieres que los inputs y formularios también tengan texto blanco en modo oscuro */
+body.dark-mode .form-control,
+body.dark-mode .form-label {
+    color: #fff !important;
+}
+
+/* Tabla de agregar activo adaptada a modo oscuro */
+body.dark-mode .add-asset-table,
+body.dark-mode .add-asset-table th,
+body.dark-mode .add-asset-table td {
+    background: #23232a !important;
+    color: #fff !important;
+    border-color: #444 !important;
+}
+
+/* Adaptación completa de campos y etiquetas del formulario de agregar asset/cripto al modo oscuro */
+
+/* Etiquetas (labels) */
+body.dark-mode label,
+body.dark-mode .form-label,
+body.dark-mode .add-asset-table th {
+    color: #fff !important;
+}
+
+/* Inputs, selects y textareas */
+body.dark-mode .add-asset-table input,
+body.dark-mode .add-asset-table select,
+body.dark-mode .add-asset-table textarea,
+body.dark-mode .form-control {
+    background: #18181b !important;
+    color: #fff !important;
+    border: 1.5px solid #444 !important;
+}
+
+/* Placeholders */
+body.dark-mode .add-asset-table input::placeholder,
+body.dark-mode .add-asset-table textarea::placeholder,
+body.dark-mode .form-control::placeholder {
+    color: #ccc !important;
+    opacity: 0.7;
+}
+
+/* Celdas de la tabla */
+body.dark-mode .add-asset-table td {
+    background: #23232a !important;
+    color: #fff !important;
+    border-color: #444 !important;
+}
+
+/* Solo las etiquetas label.form-label serán blancas en modo oscuro */
+body.dark-mode label.form-label {
+    color: #fff !important;
+}
+
+/* Fondo negro para el formulario de agregar asset en modo oscuro */
+body.dark-mode #assetFormContainer {
+    background: #18181b !important;
+    color: #fff !important;
+    border-radius: 1rem;
+    border: 1.5px solid #444 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+/* Fondo negro para todas las tarjetas (card) dentro del dashboard en modo oscuro */
+body.dark-mode .dashboard-container .container .card {
+    background: #18181b !important;
+    color: #fff !important;
+    border-radius: 1rem;
+    border: 1.5px solid #444 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+/* Letras blancas para el botón de detalles en modo oscuro dentro del formulario de agregar asset */
+body.dark-mode #assetFormContainer #addAssetForm #toggleDetailsAsset.btn.btn-outline-dark {
+    color: #fff !important;
+    border-color: #fff !important;
+}
+
+/* Letras blancas para el botón de detalles en modo oscuro dentro del formulario de agregar cripto */
+body.dark-mode #cryptoFormContainer #addCryptoForm #toggleDetailsCrypto.btn.btn-outline-dark {
+    color: #fff !important;
+    border-color: #fff !important;
+}
+
+/* Letras blancas para el botón personalizado dentro del formulario en modo oscuro */
+body.dark-mode #assetFormContainer #addAssetForm .btn.btn-custom.w-100 {
+    color: #fff !important;
+    border-color: #fff !important;
+    background: #23232a !important;
+}
+
+/* Opcional: al pasar el mouse, invertir colores para mejor feedback */
+body.dark-mode #assetFormContainer #addAssetForm .btn.btn-custom.w-100:hover {
+    background: #fff !important;
+    color: #18181b !important;
+    border-color: #fff !important;
+}
+
+/* Opcional: al pasar el mouse, invertir colores para mejor feedback */
+body.dark-mode #cryptoFormContainer #addCryptoForm #toggleDetailsCrypto.btn.btn-outline-dark:hover {
+    background: #fff !important;
+    color: #18181b !important;
+    border-color: #fff !important;
 }

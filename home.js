@@ -191,9 +191,7 @@ function renderPortfolio() {
                     <button class="btn btn-danger btn-sm" onclick="window.deleteAsset(${idx})">
                         <i class="fas fa-trash"></i>
                     </button>
-                    <button class="btn btn-primary btn-sm" onclick="window.updateAssetPrice(${idx})">
-                        <i class="fas fa-sync-alt"></i>
-                    </button>
+                   
                 </td>
             </tr>
         `;
@@ -216,7 +214,7 @@ async function addAsset(formData) {
         type: 'stock',
         quantity: parseFloat(formData.quantity),
         purchase_price: parseFloat(formData.purchase_price),
-        current_price: parseFloat(formData.purchase_price),
+        current_price: null, // Se actualizará abajo
         currency: formData.currency || 'USD',
         purchase_date: formData.purchase_date || '',
         notes: formData.notes || '',
@@ -226,8 +224,15 @@ async function addAsset(formData) {
         profit: 0,
         created: new Date()
     };
+
+    // Obtener precio actual automáticamente
+    newAsset.current_price = await getCurrentPriceYahoo(newAsset.ticker);
+    if (newAsset.current_price === null || newAsset.current_price === undefined) {
+        newAsset.current_price = newAsset.purchase_price;
+    }
     newAsset.value = newAsset.quantity * newAsset.current_price;
     newAsset.profit = newAsset.value - (newAsset.quantity * newAsset.purchase_price) - newAsset.commission;
+
     portfolioData.push(newAsset);
     savePortfolio();
     updateStats();
@@ -252,7 +257,7 @@ async function addCrypto(formData) {
         type: 'crypto',
         quantity: parseFloat(formData.crypto_quantity),
         purchase_price: parseFloat(formData.crypto_purchase_price),
-        current_price: parseFloat(formData.crypto_purchase_price),
+        current_price: null, // Se actualizará abajo
         currency: formData.crypto_currency || 'USD',
         purchase_date: formData.crypto_purchase_date || '',
         notes: formData.crypto_notes || '',
@@ -262,8 +267,15 @@ async function addCrypto(formData) {
         profit: 0,
         created: new Date()
     };
+
+    // Obtener precio actual automáticamente
+    newCrypto.current_price = await getCurrentPriceCrypto(cryptoId.toLowerCase(), (newCrypto.currency || 'usd').toLowerCase());
+    if (newCrypto.current_price === null || newCrypto.current_price === undefined) {
+        newCrypto.current_price = newCrypto.purchase_price;
+    }
     newCrypto.value = newCrypto.quantity * newCrypto.current_price;
     newCrypto.profit = newCrypto.value - (newCrypto.quantity * newCrypto.purchase_price) - newCrypto.commission;
+
     portfolioData.push(newCrypto);
     savePortfolio();
     updateStats();
@@ -401,31 +413,32 @@ document.getElementById('toggleCryptoForm').addEventListener('click', function()
 });
 
 // Modo oscuro
+// Botón de modo oscuro funcional en el sidebar
 const toggleThemeBtn = document.getElementById('toggleThemeBtn');
-toggleThemeBtn.addEventListener('click', function() {
-    const isDarkMode = document.body.classList.toggle('dark-mode');
-    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
-    toggleThemeBtn.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-    showAlert(isDarkMode ? 'Modo oscuro activado' : 'Modo claro activado', 'info');
-});
-document.addEventListener('DOMContentLoaded', function() {
-    function setThemeIcon() {
-        if (document.body.classList.contains('dark-mode')) {
-            toggleThemeBtn.innerHTML = '<i class="fas fa-sun"></i>';
+const themeIcon = toggleThemeBtn.querySelector('i');
+
+// Cargar preferencia guardada
+if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('dark-mode');
+    if (themeIcon) themeIcon.classList.replace('fa-moon', 'fa-sun');
+    toggleThemeBtn.innerHTML = '<i class="fas fa-sun me-2"></i> Modo Claro';
+}
+
+toggleThemeBtn.addEventListener('click', function (e) {
+    e.preventDefault();
+    document.body.classList.toggle('dark-mode');
+    const isDark = document.body.classList.contains('dark-mode');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    // Cambia el icono y texto
+    if (themeIcon) {
+        if (isDark) {
+            themeIcon.classList.replace('fa-moon', 'fa-sun');
+            toggleThemeBtn.innerHTML = '<i class="fas fa-sun me-2"></i> Modo Claro';
         } else {
-            toggleThemeBtn.innerHTML = '<i class="fas fa-moon"></i>';
+            themeIcon.classList.replace('fa-sun', 'fa-moon');
+            toggleThemeBtn.innerHTML = '<i class="fas fa-moon me-2"></i> Modo Oscuro';
         }
     }
-    if (localStorage.getItem('theme') === 'dark') {
-        document.body.classList.add('dark-mode');
-    }
-    setThemeIcon();
-    toggleThemeBtn.addEventListener('click', function() {
-        const isDarkMode = document.body.classList.toggle('dark-mode');
-        localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
-        setThemeIcon();
-        showAlert(isDarkMode ? 'Modo oscuro activado' : 'Modo claro activado', 'info');
-    });
 });
 
 // Cargar portafolio desde Firestore al iniciar sesión

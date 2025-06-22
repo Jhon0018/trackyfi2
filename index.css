@@ -349,3 +349,58 @@ body.dark-mode .feature-icon {
 body.dark-mode .shape i {
     color: #fff !important;
 }
+
+/* Color gris para el email del usuario en la navbar */
+#userInfo #userEmail.navbar-text {
+    color: #888 !important;
+}
+
+/* Botón logout en blanco y negro en modo oscuro */
+body.dark-mode #userInfo #logoutBtn.btn.btn-outline-dark {
+    color: #fff !important;
+    border-color: #fff !important;
+    background: #000 !important;
+}
+
+/* Al pasar el mouse: fondo blanco y texto negro */
+body.dark-mode #userInfo #logoutBtn.btn.btn-outline-dark:hover {
+    background: #fff !important;
+    color: #000 !important;
+    border-color: #fff !important;
+}
+
+/* Botón de modo oscuro (toggleThemeBtn) blanco y negro en modo oscuro */
+body.dark-mode .navbar-nav .btn.btn-outline-dark.ms-2,
+body.dark-mode #toggleThemeBtn.btn.btn-outline-dark.ms-2 {
+    color: #fff !important;
+    border-color: #fff !important;
+    background: #000 !important;
+}
+
+/* Al pasar el mouse: fondo blanco y texto negro */
+body.dark-mode .navbar-nav .btn.btn-outline-dark.ms-2:hover,
+body.dark-mode #toggleThemeBtn.btn.btn-outline-dark.ms-2:hover {
+    background: #fff !important;
+    color: #000 !important;
+    border-color: #fff !important;
+}
+
+/* Menú lateral (sideMenu) oscuro en modo dark, normal en modo claro */
+body.dark-mode #sideMenu.offcanvas {
+    background: #18181b !important;
+    color: #fff !important;
+    border-left: 1.5px solid #444 !important;
+}
+
+body.dark-mode #sideMenu.offcanvas .offcanvas-header,
+body.dark-mode #sideMenu.offcanvas .offcanvas-body {
+    background: transparent !important;
+    color: #fff !important;
+}
+
+/* Opcional: enlaces y botones dentro del menú lateral en modo oscuro */
+body.dark-mode #sideMenu.offcanvas a,
+body.dark-mode #sideMenu.offcanvas .btn {
+    color: #fff !important;
+    border-color: #fff !important;
+}
