@@ -45,9 +45,12 @@ function showAlert(message, type = 'info') {
 
 // Estadísticas
 function updateStats() {
-    const totalValue = portfolioData.reduce((sum, item) => sum + item.value, 0);
-    const totalInvestment = portfolioData.reduce((sum, item) => sum + (item.quantity * item.purchase_price), 0);
-    const totalProfit = totalValue - totalInvestment;
+    const totalValue = portfolioData.reduce((sum, item) => 
+        (item.value !== null && !isNaN(item.value)) ? sum + item.value : sum, 0);
+    const totalInvestment = portfolioData.reduce((sum, item) => 
+        (item.quantity && item.purchase_price) ? sum + (item.quantity * item.purchase_price) : sum, 0);
+    const totalProfit = portfolioData.reduce((sum, item) => 
+        (item.profit !== null && !isNaN(item.profit)) ? sum + item.profit : sum, 0);
 
     document.getElementById('totalValue').textContent = formatCurrency(totalValue);
     document.getElementById('totalInvestment').textContent = formatCurrency(totalInvestment);
@@ -188,10 +191,12 @@ function renderPortfolio() {
                     <button class="btn btn-warning btn-sm me-1" onclick="window.editAsset(${idx})">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="btn btn-danger btn-sm" onclick="window.deleteAsset(${idx})">
+                    <button class="btn btn-danger btn-sm me-1" onclick="window.deleteAsset(${idx})">
                         <i class="fas fa-trash"></i>
                     </button>
-                   
+                    <button class="btn btn-primary btn-sm" onclick="window.handleUpdatePrice(${idx})">
+                        <i class="fas fa-sync-alt"></i> Actualizar
+                    </button>
                 </td>
             </tr>
         `;
@@ -214,37 +219,43 @@ async function addAsset(formData) {
         type: 'stock',
         quantity: parseFloat(formData.quantity),
         purchase_price: parseFloat(formData.purchase_price),
-        current_price: null, // Se actualizará abajo
+        current_price: null,
         currency: formData.currency || 'USD',
         purchase_date: formData.purchase_date || '',
         notes: formData.notes || '',
         commission: parseFloat(formData.commission) || 0,
         broker: formData.broker || '',
-        value: 0,
-        profit: 0,
+        value: null,
+        profit: null,
         created: new Date()
     };
 
     // Obtener precio actual automáticamente
     newAsset.current_price = await getCurrentPriceYahoo(newAsset.ticker);
-    if (newAsset.current_price === null || newAsset.current_price === undefined) {
-        newAsset.current_price = newAsset.purchase_price;
-    }
-    newAsset.value = newAsset.quantity * newAsset.current_price;
-    newAsset.profit = newAsset.value - (newAsset.quantity * newAsset.purchase_price) - newAsset.commission;
-
-    portfolioData.push(newAsset);
-    savePortfolio();
-    updateStats();
-    renderPortfolio();
-    showAlert('Activo agregado exitosamente', 'success');
-    // Guardar en Firestore
-    if (currentUserId) {
-        try {
-            await addDoc(collection(db, "activo"), newAsset);
-        } catch (e) {
-            showAlert('No se pudo guardar en la nube: ' + e.message, 'danger');
+    if (newAsset.current_price !== null && newAsset.current_price !== undefined) {
+        newAsset.value = newAsset.quantity * newAsset.current_price;
+        newAsset.profit = newAsset.value - (newAsset.quantity * newAsset.purchase_price) - newAsset.commission;
+        portfolioData.push(newAsset);
+        savePortfolio();
+        updateStats();
+        renderPortfolio();
+        showAlert('Activo agregado exitosamente', 'success');
+        // Guardar en Firestore
+        if (currentUserId) {
+            try {
+                await addDoc(collection(db, "activo"), newAsset);
+            } catch (e) {
+                showAlert('No se pudo guardar en la nube: ' + e.message, 'danger');
+            }
         }
+    } else {
+        newAsset.value = null;
+        newAsset.profit = null;
+        portfolioData.push(newAsset);
+        savePortfolio();
+        updateStats();
+        renderPortfolio();
+        showAlert('Este activo no existe o el ticker es incorrecto.', 'danger');
     }
 }
 
@@ -257,37 +268,43 @@ async function addCrypto(formData) {
         type: 'crypto',
         quantity: parseFloat(formData.crypto_quantity),
         purchase_price: parseFloat(formData.crypto_purchase_price),
-        current_price: null, // Se actualizará abajo
+        current_price: null,
         currency: formData.crypto_currency || 'USD',
         purchase_date: formData.crypto_purchase_date || '',
         notes: formData.crypto_notes || '',
         commission: parseFloat(formData.crypto_commission) || 0,
         broker: formData.crypto_broker || '',
-        value: 0,
-        profit: 0,
+        value: null,
+        profit: null,
         created: new Date()
     };
 
     // Obtener precio actual automáticamente
     newCrypto.current_price = await getCurrentPriceCrypto(cryptoId.toLowerCase(), (newCrypto.currency || 'usd').toLowerCase());
-    if (newCrypto.current_price === null || newCrypto.current_price === undefined) {
-        newCrypto.current_price = newCrypto.purchase_price;
-    }
-    newCrypto.value = newCrypto.quantity * newCrypto.current_price;
-    newCrypto.profit = newCrypto.value - (newCrypto.quantity * newCrypto.purchase_price) - newCrypto.commission;
-
-    portfolioData.push(newCrypto);
-    savePortfolio();
-    updateStats();
-    renderPortfolio();
-    showAlert('Criptomoneda agregada exitosamente', 'success');
-    // Guardar en Firestore
-    if (currentUserId) {
-        try {
-            await addDoc(collection(db, "cripto"), newCrypto);
-        } catch (e) {
-            showAlert('No se pudo guardar en la nube: ' + e.message, 'danger');
+    if (newCrypto.current_price !== null && newCrypto.current_price !== undefined) {
+        newCrypto.value = newCrypto.quantity * newCrypto.current_price;
+        newCrypto.profit = newCrypto.value - (newCrypto.quantity * newCrypto.purchase_price) - newCrypto.commission;
+        portfolioData.push(newCrypto);
+        savePortfolio();
+        updateStats();
+        renderPortfolio();
+        showAlert('Criptomoneda agregada exitosamente', 'success');
+        // Guardar en Firestore
+        if (currentUserId) {
+            try {
+                await addDoc(collection(db, "cripto"), newCrypto);
+            } catch (e) {
+                showAlert('No se pudo guardar en la nube: ' + e.message, 'danger');
+            }
         }
+    } else {
+        newCrypto.value = null;
+        newCrypto.profit = null;
+        portfolioData.push(newCrypto);
+        savePortfolio();
+        updateStats();
+        renderPortfolio();
+        showAlert('Esta criptomoneda no existe o el id es incorrecto.', 'danger');
     }
 }
 
@@ -516,6 +533,47 @@ async function getCurrentPriceCrypto(cryptoId, currency = 'usd') {
 
 // Actualiza el precio y recalcula ganancia/pérdida
 window.updateAssetPrice = async function(idx) {
+    const asset = portfolioData[idx];
+    if (!asset) return;
+
+    let price = null;
+    if (asset.type === "crypto") {
+        price = await getCurrentPriceCrypto(asset.name.toLowerCase(), (asset.currency || 'usd').toLowerCase());
+        if (price === null || price === undefined) {
+            asset.current_price = null;
+            asset.value = null;
+            asset.profit = null;
+            savePortfolio();
+            updateStats();
+            renderPortfolio();
+            showAlert(`La criptomoneda "${asset.name}" no existe o el id es incorrecto.`, 'danger');
+            return;
+        }
+    } else {
+        price = await getCurrentPriceYahoo(asset.ticker);
+        if (price === null || price === undefined) {
+            asset.current_price = null;
+            asset.value = null;
+            asset.profit = null;
+            savePortfolio();
+            updateStats();
+            renderPortfolio();
+            showAlert(`El activo "${asset.ticker}" no existe o el ticker es incorrecto.`, 'danger');
+            return;
+        }
+    }
+
+    asset.current_price = price;
+    asset.value = asset.quantity * asset.current_price;
+    asset.profit = asset.value - (asset.quantity * asset.purchase_price) - (asset.commission || 0);
+    savePortfolio();
+    updateStats();
+    renderPortfolio();
+    showAlert(`Precio actualizado para ${asset.name}: ${formatCurrency(price)}`, 'success');
+};
+
+// Agrega esta función al final de tu archivo JS:
+window.handleUpdatePrice = async function(idx) {
     const asset = portfolioData[idx];
     if (!asset) return;
 
