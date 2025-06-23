@@ -113,15 +113,16 @@ body {
     padding: 2rem 0 2rem 0;
     background: transparent;
     min-height: 100vh;
-    margin-left: 240px;
+    margin-left: 220px; /* igual al ancho del sidebar */
+    width: calc(100vw - 220px); /* ocupa todo menos la barra lateral */
     display: flex;
     flex-direction: column;
-    align-items: center;    /* Centra horizontalmente el contenido */
-    transition: background 0.4s, margin-left 0.3s;
+    align-items: flex-start;
+    transition: background 0.4s, margin-left 0.3s, width 0.3s;
 }
 .stats-card {
     background: #fff;
-    border-radius: 1rem;
+    border-radius: 9rem;
     padding: 2rem;
     border: 1.5px solid #e5e7eb;
     box-shadow: 0 2px 8px rgba(0,0,0,0.03);
@@ -560,4 +561,77 @@ body.dark-mode #cryptoFormContainer #addCryptoForm #toggleDetailsCrypto.btn.btn-
     background: #fff !important;
     color: #18181b !important;
     border-color: #fff !important;
+}
+
+/* Ajusta el ancho de .card-body al ancho de su .container en el dashboard */
+.dashboard-container .container .card .card-body {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
+
+/* Adapta #portfolioContent al ancho de la tarjeta y con buen espaciado en modo oscuro */
+body.dark-mode .dashboard-container .container .card .card-body #portfolioContent {
+    width: 100%;
+    max-width: 100%;
+    background: transparent;
+    color: #fff !important;
+    padding: 1.5rem 0;
+    box-sizing: border-box;
+    border-radius: 0.7rem;
+}
+
+/* En responsive, reduce el padding */
+@media (max-width: 991px) {
+    .dashboard-container .container .card .card-body {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+}
+
+/* Botón dorado para Trackerfolio Premium en el sidebar */
+.btn-premium {
+    background: linear-gradient(90deg, #978105 60%, #8b6f0b 100%);
+    color: #18181b !important;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.15);
+    transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    font-size: 1rem;
+    padding: 10px 18px;
+}
+
+.btn-premium:hover, .btn-premium:focus {
+    background: linear-gradient(90deg, #816404 60%, #6c5d08 100%);
+    color: #fff !important;
+    box-shadow: 0 4px 16px rgba(255, 215, 0, 0.25);
+    text-shadow: 0 1px 8px #bfa100;
+}
+
+/* Estilo profesional para la gráfica de rendimiento ponderado */
+#weightedPerformanceChart {
+    background: transparent;
+    border-radius: 1rem;
+    padding: 1rem;
+    box-shadow: 0 2px 12px 0 rgba(37,99,235,0.07);
+    transition: background 0.3s;
+}
+body.dark-mode #weightedPerformanceChart {
+    background: #23232a;
+    box-shadow: 0 2px 12px 0 rgba(16,185,129,0.07);
+}
+.card-header .btn-outline-primary,
+.card-header .btn-outline-success {
+    min-width: 110px;
+    font-weight: 500;
+}
+.card-header .btn-primary,
+.card-header .btn-success {
+    color: #fff !important;
 }

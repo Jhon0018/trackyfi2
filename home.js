@@ -18,7 +18,7 @@ const db = getFirestore(app);
 
 let currentUserId = null;
 let portfolioData = JSON.parse(localStorage.getItem('portfolioData') || '[]');
-let profitPieChart, profitBarChart;
+let profitPieChart, profitBarChart, weightedPerformanceChartInstance = null;
 
 // Utilidades
 function savePortfolio() {
@@ -123,6 +123,77 @@ function renderCharts() {
     });
 }
 
+function renderWeightedPerformanceChart(type = 'performance') {
+    const ctx = document.getElementById('weightedPerformanceChart').getContext('2d');
+    const labels = portfolioData.map(asset => asset.name || asset.ticker || 'Activo');
+    let data = [];
+    let chartLabel = '';
+    let borderColor = '';
+    let backgroundColor = '';
+
+    if (type === 'performance') {
+        // Rendimiento ponderado en %
+        data = portfolioData.map(asset => {
+            const inversion = (asset.quantity * asset.purchase_price) + (asset.commission || 0);
+            if (!inversion || inversion === 0) return 0;
+            return ((asset.profit || 0) / inversion) * 100;
+        });
+        chartLabel = 'Rendimiento Ponderado (%)';
+        borderColor = '#2563eb'; // azul
+        backgroundColor = 'rgba(37,99,235,0.1)';
+        document.getElementById('performanceChartTitle').textContent = 'Rendimiento Ponderado (%)';
+    } else {
+        // Valor total de la inversión
+        data = portfolioData.map(asset => asset.value ?? 0);
+        chartLabel = 'Valor Total';
+        borderColor = '#10b981'; // verde
+        backgroundColor = 'rgba(16,185,129,0.1)';
+        document.getElementById('performanceChartTitle').textContent = 'Valor Total';
+    }
+
+    // Destruir el gráfico anterior si existe
+    if (weightedPerformanceChartInstance) {
+        weightedPerformanceChartInstance.destroy();
+    }
+
+    weightedPerformanceChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: chartLabel,
+                data: data,
+                borderColor: borderColor,
+                backgroundColor: backgroundColor,
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: true },
+                tooltip: { enabled: true }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: document.body.classList.contains('dark-mode') ? '#fff' : '#18181b',
+                        callback: function(value) {
+                            return type === 'performance' ? value + '%' : value;
+                        }
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: document.body.classList.contains('dark-mode') ? '#fff' : '#18181b'
+                    }
+                }
+            }
+        }
+    });
+}
+
 // Portafolio
 function renderPortfolio() {
     const container = document.getElementById('portfolioContent');
@@ -208,6 +279,7 @@ function renderPortfolio() {
     `;
     container.innerHTML = tableHTML;
     renderCharts();
+    renderWeightedPerformanceChart('performance');
 }
 
 // CRUD
@@ -611,4 +683,61 @@ window.handleUpdatePrice = async function(idx) {
     updateStats();
     renderPortfolio();
     showAlert(`Precio actualizado para ${asset.name}: ${formatCurrency(price)}`, 'success');
+};
+
+// Inicializa el tooltip de Bootstrap para el botón premium
+document.addEventListener('DOMContentLoaded', function () {
+    var premiumBtn = document.getElementById('sidebarPremiumBtn');
+    if (premiumBtn) {
+        new bootstrap.Tooltip(premiumBtn);
+    }
+});
+
+// Botones para alternar entre rendimiento (%) y valor total
+document.getElementById('showWeightedPerformanceChart').addEventListener('click', function() {
+    renderWeightedPerformanceChart('performance');
+    this.classList.replace('btn-outline-primary', 'btn-primary');
+    document.getElementById('showTotalValueChart').classList.replace('btn-primary', 'btn-outline-secondary');
+});
+document.getElementById('showTotalValueChart').addEventListener('click', function() {
+    renderWeightedPerformanceChart('value');
+    this.classList.replace('btn-outline-secondary', 'btn-primary');
+    document.getElementById('showWeightedPerformanceChart').classList.replace('btn-primary', 'btn-outline-primary');
+});
+
+// Descargar gráfica como imagen siempre en modo claro
+document.getElementById('downloadChartBtn').onclick = function() {
+    const chartCanvas = document.getElementById('weightedPerformanceChart');
+    const wasDark = document.body.classList.contains('dark-mode');
+
+    // Si está en modo oscuro, cambia temporalmente a modo claro
+    if (wasDark) {
+        document.body.classList.remove('dark-mode');
+        // Espera a que los estilos se apliquen antes de exportar
+        setTimeout(() => {
+            const url = chartCanvas.toDataURL('image/png');
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'grafica_rendimiento.png';
+            a.click();
+            // Vuelve a modo oscuro
+            document.body.classList.add('dark-mode');
+        }, 300); // 300ms para asegurar el cambio de estilos
+    } else {
+        const url = chartCanvas.toDataURL('image/png');
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'grafica_rendimiento.png';
+        a.click();
+    }
+};
+
+// Refrescar datos de la gráfica
+document.getElementById('refreshChartBtn').onclick = function() {
+    renderWeightedPerformanceChart(); // O la función que uses para actualizar
+};
+
+// Mostrar ayuda
+document.getElementById('helpChartBtn').onclick = function() {
+    alert('Esta gráfica muestra el rendimiento ponderado (%) o el valor total de tus inversiones. Usa los botones para alternar la vista.');
 };

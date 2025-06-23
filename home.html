@@ -49,6 +49,16 @@
                     <i class="fas fa-moon me-2"></i> Modo Oscuro
                 </a>
             </li>
+            <li>
+                <button 
+                    class="btn btn-premium w-100 my-2" 
+                    id="sidebarPremiumBtn" 
+                    data-bs-toggle="tooltip" 
+                    data-bs-placement="right" 
+                    title="Accede a todas las funciones por solo $5">
+                    <i class="fas fa-crown me-2"></i> Trackerfolio Premium
+                </button>
+            </li>
         </ul>
     </div>
 
@@ -246,23 +256,36 @@
                     </div>
                 </div>
 
-                <!-- Suscripción Premium -->
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="card shadow-sm border-primary">
-            <div class="card-body d-flex flex-column flex-md-row align-items-center justify-content-between">
-                <div>
-                    <h5 class="mb-1 text-primary"><i class="fas fa-crown me-2"></i>TrackYfi Premium</h5>
-                    <p class="mb-0 text-muted">Accede a todas las funciones avanzadas por solo <b>$5 USD/mes</b>.</p>
+                <!-- Gráfica de Rendimiento Ponderado -->
+                <div class="card mt-4">
+                    <div class="card-header d-flex align-items-center justify-content-between">
+                        <span>
+                            <i class="fas fa-mountain me-2 text-primary"></i>
+                            <span id="performanceChartTitle">Rendimiento Ponderado (%)</span>
+                        </span>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-outline-primary btn-sm" id="showWeightedPerformanceChart">
+                                <i class="fas fa-percentage me-1"></i>Rendimiento (%)
+                            </button>
+                            <button class="btn btn-outline-success btn-sm" id="showTotalValueChart">
+                                <i class="fas fa-dollar-sign me-1"></i>Valor Total
+                            </button>
+                            <button class="btn btn-outline-info btn-sm" id="downloadChartBtn" title="Descargar gráfica">
+                                <i class="fas fa-download"></i>
+                            </button>
+                            <button class="btn btn-outline-secondary btn-sm" id="refreshChartBtn" title="Actualizar datos">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                            <button class="btn btn-outline-dark btn-sm" id="helpChartBtn" title="Ayuda sobre la gráfica">
+                                <i class="fas fa-question-circle"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="weightedPerformanceChart" height="90"></canvas>
+                    </div>
                 </div>
-                <div id="subscriptionStatus" class="my-2 my-md-0"></div>
-                <button id="subscribeBtn" class="btn btn-warning btn-lg ms-md-3">
-                    <i class="fas fa-credit-card me-2"></i>Suscribirme
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
+             
             </div>
         </div>
 
