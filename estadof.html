@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Estado Financiero - TrackYfi</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .ratio-card { min-height: 210px; }
+        .ratio-card .card-title { font-size: 1.1rem; }
+        .table-financial th, .table-financial td { font-size: 0.95rem; }
+    </style>
+</head>
+<body>
+<div class="container py-4">
+    <h2 class="mb-4"><i class="fas fa-balance-scale"></i> Estado Financiero de <span id="symbolTitle">AAPL</span></h2>
+    <div class="mb-3">
+        <input type="text" id="symbolInput" class="form-control" placeholder="Ej: AAPL, MSFT, TSLA" style="max-width:200px;display:inline-block;">
+        <button class="btn btn-primary ms-2" onclick="loadFinancials()">Buscar</button>
+    </div>
+    <div id="ratios" class="row g-3"></div>
+    <hr>
+    <h4>Estado de Resultados</h4>
+    <div id="incomeTable" class="table-responsive"></div>
+    <h4 class="mt-4">Balance General</h4>
+    <div id="balanceTable" class="table-responsive"></div>
+    <h4 class="mt-4">Flujo de Caja</h4>
+    <div id="cashflowTable" class="table-responsive"></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+<script>
+const RAPIDAPI_KEY = "86e6592280mshb63eb4f106fe42cp14510djsn915f913aba12"; // Tu API Key de RapidAPI
+
+async function fetchYahooFinancials(symbol) {
+    const url = `http://localhost:5000/api/estadof/${symbol}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("No se pudo obtener información financiera.");
+    return await res.json();
+}
+
+function safe(val) {
+    return (val !== undefined && val !== null) ? Number(val).toLocaleString() : 'N/D';
+}
+
+function ratio(n, d) {
+    if (n === null || n === undefined || d === null || d === undefined || d === 0) return 'N/D';
+    return (n / d).toFixed(4);
+}
+
+function buildTable(fields, periods) {
+    let html = `<table class="table table-sm table-bordered table-financial"><thead><tr><th>Cuenta</th>`;
+    periods.forEach(p => html += `<th>${p}</th>`);
+    html += `</tr></thead><tbody>`;
+    fields.forEach(f => {
+        html += `<tr><td>${f.label}</td>`;
+        periods.forEach((p, i) => {
+            html += `<td>${safe(f.values[i])}</td>`;
+        });
+        html += `</tr>`;
+    });
+    html += `</tbody></table>`;
+    return html;
+}
+
+async function loadFinancials() {
+    const symbol = document.getElementById('symbolInput').value.trim() || 'AAPL';
+    document.getElementById('symbolTitle').textContent = symbol.toUpperCase();
+    document.getElementById('ratios').innerHTML = '<div class="text-center my-4"><div class="spinner-border"></div></div>';
+    document.getElementById('incomeTable').innerHTML = '';
+    document.getElementById('balanceTable').innerHTML = '';
+    document.getElementById('cashflowTable').innerHTML = '';
+
+    try {
+        const data = await fetchYahooFinancials(symbol);
+
+        if (!data.incomeStatementHistory || !data.incomeStatementHistory.incomeStatementHistory || data.incomeStatementHistory.incomeStatementHistory.length === 0) {
+            document.getElementById('ratios').innerHTML = `<div class="alert alert-danger">No se encontró información financiera para el símbolo <b>${symbol.toUpperCase()}</b>. Prueba con otro (ej: AAPL, MSFT, TSLA).</div>`;
+            return;
+        }
+
+        // Extraer periodos (años)
+        const periods = (data?.incomeStatementHistory?.incomeStatementHistory || []).map(e =>
+            e.endDate ? new Date(e.endDate.raw * 1000).getFullYear() : 'N/D'
+        );
+
+        function extract(field, arr) {
+            return arr.map(e => e[field]?.raw ?? null);
+        }
+        const incomeArr = data?.incomeStatementHistory?.incomeStatementHistory || [];
+        const balanceArr = data?.balanceSheetHistory?.balanceSheetStatements || [];
+        const cashArr = data?.cashflowStatementHistory?.cashflowStatements || [];
+
+        const incomeFields = [
+            { label: "Total Revenue", values: extract("totalRevenue", incomeArr) },
+            { label: "Cost Of Revenue", values: extract("costOfRevenue", incomeArr) },
+            { label: "Gross Profit", values: extract("grossProfit", incomeArr) },
+            { label: "Operating Expense", values: extract("totalOperatingExpenses", incomeArr) },
+            { label: "Operating Income", values: extract("operatingIncome", incomeArr) },
+            { label: "Net Income", values: extract("netIncome", incomeArr) },
+            { label: "EBITDA", values: extract("ebitda", incomeArr) },
+            { label: "Basic EPS", values: extract("basicEPS", incomeArr) },
+            { label: "Diluted EPS", values: extract("dilutedEPS", incomeArr) }
+        ];
+        const balanceFields = [
+            { label: "Total Assets", values: extract("totalAssets", balanceArr) },
+            { label: "Total Liab", values: extract("totalLiab", balanceArr) },
+            { label: "Total Stockholder Equity", values: extract("totalStockholderEquity", balanceArr) },
+            { label: "Long Term Debt", values: extract("longTermDebt", balanceArr) }
+        ];
+        const cashFields = [
+            { label: "Total Cash From Operating Activities", values: extract("totalCashFromOperatingActivities", cashArr) },
+            { label: "Total Cashflows From Investing Activities", values: extract("totalCashflowsFromInvestingActivities", cashArr) },
+            { label: "Total Cash From Financing Activities", values: extract("totalCashFromFinancingActivities", cashArr) },
+            { label: "Change In Cash", values: extract("changeInCash", cashArr) }
+        ];
+
+        document.getElementById('incomeTable').innerHTML = buildTable(incomeFields, periods);
+        document.getElementById('balanceTable').innerHTML = buildTable(balanceFields, periods);
+        document.getElementById('cashflowTable').innerHTML = buildTable(cashFields, periods);
+
+        // Ratios
+        let ratiosHTML = '';
+        for (let i = 0; i < periods.length; i++) {
+            const revenue = incomeFields[0].values[i];
+            const net_income = incomeFields[5].values[i];
+            const ebitda = incomeFields[6].values[i];
+            const gross_profit = incomeFields[2].values[i];
+            const total_assets = balanceFields[0].values[i];
+            const total_liab = balanceFields[1].values[i];
+            const equity = balanceFields[2].values[i];
+            const cash_op = cashFields[0].values[i];
+
+            ratiosHTML += `
+            <div class="col-md-4">
+                <div class="card shadow-sm ratio-card">
+                    <div class="card-body">
+                        <h6 class="card-title mb-2">${periods[i]}</h6>
+                        <ul class="list-unstyled mb-0">
+                            <li>📈 Margen Neto: <b>${ratio(net_income, revenue)}</b></li>
+                            <li>📊 ROE: <b>${ratio(net_income, equity)}</b></li>
+                            <li>💸 Deuda/Activos: <b>${ratio(total_liab, total_assets)}</b></li>
+                            <li>🏦 Deuda/Patrimonio: <b>${ratio(total_liab, equity)}</b></li>
+                            <li>🧪 Margen Bruto: <b>${ratio(gross_profit, revenue)}</b></li>
+                            <li>📉 EBITDA/Ingresos: <b>${ratio(ebitda, revenue)}</b></li>
+                            <li>💵 CashFlow Op/Ingresos: <b>${ratio(cash_op, revenue)}</b></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>`;
+        }
+        document.getElementById('ratios').innerHTML = ratiosHTML || '<div class="alert alert-warning">No hay ratios disponibles.</div>';
+    } catch (e) {
+        document.getElementById('ratios').innerHTML = `<div class="alert alert-danger">No se pudo obtener información financiera para este símbolo.<br>${e.message}</div>`;
+        document.getElementById('incomeTable').innerHTML = '';
+        document.getElementById('balanceTable').innerHTML = '';
+        document.getElementById('cashflowTable').innerHTML = '';
+    }
+}
+window.onload = loadFinancials;
+</script>
+</body>
+</html>
