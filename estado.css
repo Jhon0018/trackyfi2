@@ -1,0 +1,178 @@
+body {
+    background: linear-gradient(135deg, #fff 0%, #e5e7eb 100%);
+    color: #18181b;
+    font-family: 'Roboto', Arial, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+.container {
+    background: #fff;
+    border-radius: 32px;
+    box-shadow: 0 12px 48px 0 #bbb, 0 1.5px 12px 0 #2222;
+    padding: 3rem 2.5rem 2.5rem 2.5rem;
+    margin-top: 2.5rem;
+    margin-bottom: 2.5rem;
+    border: 2.5px solid #18181b;
+    position: relative;
+    z-index: 2;
+}
+.neon-glow {
+    text-shadow: 0 0 8px #bbb, 0 0 16px #2222, 0 0 32px #bbb;
+}
+h2, h4 {
+    font-family: 'Orbitron', Arial, sans-serif;
+    letter-spacing: 2px;
+    color: #18181b;
+    text-shadow: 0 2px 16px #bbb, 0 0 8px #2222;
+}
+.form-control, .btn-primary {
+    border-radius: 16px;
+    font-size: 1.15rem;
+}
+.btn-primary {
+    background: linear-gradient(90deg, #18181b 0%, #444 100%);
+    color: #fff;
+    border: none;
+    font-weight: bold;
+    box-shadow: 0 2px 16px #bbb, 0 0 8px #2222;
+    transition: transform 0.15s, box-shadow 0.15s;
+    letter-spacing: 1px;
+}
+.btn-primary:hover {
+    transform: scale(1.08) rotate(-2deg);
+    background: linear-gradient(90deg, #444 0%, #18181b 100%);
+    box-shadow: 0 4px 32px #18181b, 0 0 16px #444;
+}
+.ratio-card {
+    min-height: 270px;
+    background: linear-gradient(135deg, #fff 0%, #e5e7eb 100%);
+    color: #18181b;
+    border-radius: 22px;
+    box-shadow: 0 6px 32px 0 #bbb, 0 0 12px #2222;
+    border: 2px solid #18181b;
+    transition: box-shadow 0.25s, transform 0.25s;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+.ratio-card:before {
+    content: "";
+    position: absolute;
+    top: -60px; left: -60px;
+    width: 120px; height: 120px;
+    background: radial-gradient(circle, #0001 0%, transparent 80%);
+    filter: blur(8px);
+    z-index: 0;
+}
+.ratio-card:hover {
+    box-shadow: 0 12px 48px 0 #18181b, 0 0 32px #444;
+    transform: translateY(-8px) scale(1.04) rotate(1deg);
+}
+.ratio-card .card-title {
+    font-size: 1.35rem;
+    font-family: 'Orbitron', Arial, sans-serif;
+    color: #18181b;
+    letter-spacing: 1.5px;
+    text-shadow: 0 0 8px #bbb;
+}
+.ratio-card ul li {
+    font-size: 1.13rem;
+    margin-bottom: 0.5rem;
+    font-family: 'Roboto', Arial, sans-serif;
+    letter-spacing: 0.5px;
+    text-shadow: 0 0 4px #bbb;
+}
+.table-financial {
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 24px 0 #bbb, 0 0 8px #2222;
+    margin-bottom: 2.5rem;
+    border: 2px solid #18181b;
+}
+.table-financial th {
+    background: linear-gradient(90deg, #18181b 0%, #444 100%);
+    color: #fff;
+    font-size: 1.13rem;
+    border: none;
+    text-align: center;
+    letter-spacing: 1px;
+    text-shadow: 0 0 6px #bbb;
+}
+.table-financial td {
+    background: #f5f5f5;
+    color: #18181b;
+    border: none;
+    text-align: center;
+    font-size: 1.09rem;
+    transition: background 0.2s, color 0.2s;
+}
+.table-financial tr:hover td {
+    background: #18181b;
+    color: #fff;
+    font-weight: bold;
+    text-shadow: 0 0 8px #bbb;
+}
+.spinner-border {
+    color: #18181b !important;
+}
+.alert-danger, .alert-warning, .alert-info {
+    border-radius: 14px;
+    font-size: 1.13rem;
+    box-shadow: 0 0 12px #bbb;
+    background: #fff;
+    color: #18181b;
+    border: 2px solid #18181b;
+}
+/* Animación de entrada */
+.fade-in {
+    animation: fadeInUp 0.9s cubic-bezier(.39,.575,.565,1.000) both;
+}
+@keyframes fadeInUp {
+    0% { opacity: 0; transform: translateY(60px) scale(0.98);}
+    100% { opacity: 1; transform: translateY(0) scale(1);}
+}
+/* Animación de fondo flotante */
+.bg-float {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+.bg-float span {
+    position: absolute;
+    display: block;
+    border-radius: 50%;
+    opacity: 0.09;
+    filter: blur(16px);
+    animation: float 12s infinite linear;
+}
+.bg-float .b1 { width: 220px; height: 220px; background: #18181b; left: 10vw; top: 10vh; animation-delay: 0s;}
+.bg-float .b2 { width: 180px; height: 180px; background: #444; left: 70vw; top: 20vh; animation-delay: 2s;}
+.bg-float .b3 { width: 140px; height: 140px; background: #18181b; left: 50vw; top: 70vh; animation-delay: 4s;}
+@keyframes float {
+    0% { transform: translateY(0) scale(1);}
+    50% { transform: translateY(-40px) scale(1.08);}
+    100% { transform: translateY(0) scale(1);}
+}
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+    width: 10px;
+    background: #e5e7eb;
+}
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #18181b 0%, #444 100%);
+    border-radius: 8px;
+}
+/* Responsive */
+@media (max-width: 900px) {
+    .container { padding: 1.2rem 0.5rem; }
+    .ratio-card { min-height: 200px; }
+    .table-financial th, .table-financial td { font-size: 0.97rem; }
+}
+@media (max-width: 600px) {
+    .container { padding: 0.5rem 0.1rem; }
+    h2 { font-size: 1.3rem; }
+    h4 { font-size: 1.1rem; }
+}

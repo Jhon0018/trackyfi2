@@ -8,413 +8,161 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            background: linear-gradient(135deg, #1e293b 0%, #0ea5e9 100%);
-            color: #f1f5f9;
-            font-family: 'Roboto', Arial, sans-serif;
-            min-height: 100vh;
-        }
-        .config-panel {
-            max-width: 900px;
-            margin: 2.5rem auto;
-            padding: 2.5rem 2rem;
-            background: rgba(30, 41, 59, 0.97);
-            border-radius: 32px;
-            box-shadow: 0 8px 32px 0 rgba(14,165,233,0.25), 0 0 12px #38bdf8;
-            border: 2.5px solid #38bdf8;
-        }
-        .avatar-block {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-        .avatar-img {
-            width: 110px;
-            height: 110px;
-            border-radius: 50%;
-            border: 4px solid #38bdf8;
-            box-shadow: 0 0 24px #0ea5e9;
-            object-fit: cover;
-            background: #1e293b;
-        }
-        .avatar-edit-btn {
-            margin-top: 0.7rem;
-            font-size: 1.05rem;
-            color: #38bdf8;
-            background: none;
-            border: none;
-            cursor: pointer;
-            text-decoration: underline;
-        }
-        .section-title {
-            font-family: 'Orbitron', Arial, sans-serif;
-            color: #38bdf8;
-            font-size: 1.18rem;
-            margin-bottom: 1rem;
-            letter-spacing: 1px;
-        }
-        .card-setting {
-            background: rgba(15, 23, 42, 0.97);
-            border-radius: 18px;
-            box-shadow: 0 2px 16px #0ea5e9;
-            border: 1.5px solid #38bdf8;
-            margin-bottom: 1.5rem;
-            padding: 1.5rem 1.2rem;
-        }
-        .setting-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1.1rem;
-        }
-        .setting-label {
-            font-weight: 500;
-            color: #f1f5f9;
-            font-size: 1.07rem;
-        }
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 48px;
-            height: 26px;
-        }
-        .switch input { display: none; }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: #334155;
-            transition: .4s;
-            border-radius: 26px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 20px; width: 20px;
-            left: 3px; bottom: 3px;
-            background: #38bdf8;
-            transition: .4s;
-            border-radius: 50%;
-            box-shadow: 0 0 8px #0ea5e9;
-        }
-        input:checked + .slider {
-            background: #0ea5e9;
-        }
-        input:checked + .slider:before {
-            transform: translateX(22px);
-            background: #fff;
-        }
-        .bg-options {
-            display: flex;
-            gap: 12px;
-        }
-        .bg-option {
-            width: 44px; height: 44px;
-            border-radius: 10px;
-            border: 2px solid #38bdf8;
-            cursor: pointer;
-            transition: border 0.2s, box-shadow 0.2s;
-        }
-        .bg-option.selected, .bg-option:hover {
-            border: 3px solid #0ea5e9;
-            box-shadow: 0 0 12px #38bdf8;
-        }
-        .premium-card {
-            background: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%);
-            color: #fff;
-            border-radius: 16px;
-            box-shadow: 0 4px 24px 0 #38bdf8;
-            padding: 1.5rem;
-            border: none;
-            margin-bottom: 1.5rem;
-        }
-        .premium-card .fa-crown {
-            color: gold;
-            text-shadow: 0 0 8px #fff59d;
-        }
-        .suggestion-block textarea {
-            background: rgba(15, 23, 42, 0.95);
-            color: #f1f5f9;
-            border-radius: 10px;
-            border: 1.5px solid #38bdf8;
-            width: 100%;
-            min-height: 60px;
-            margin-top: 0.5rem;
-        }
-        .btn-save {
-            background: linear-gradient(90deg, #38bdf8 0%, #0ea5e9 100%);
-            border: none;
-            font-weight: bold;
-            border-radius: 14px;
-            box-shadow: 0 2px 16px #0ea5e9, 0 0 8px #38bdf8;
-            font-size: 1.13rem;
-            letter-spacing: 1px;
-            transition: transform 0.15s, box-shadow 0.15s;
-            margin-top: 1.5rem;
-        }
-        .btn-save:hover {
-            transform: scale(1.06);
-            background: linear-gradient(90deg, #0ea5e9 0%, #38bdf8 100%);
-            box-shadow: 0 4px 32px #38bdf8, 0 0 16px #0ea5e9;
-        }
-        .alert {
-            border-radius: 12px;
-            font-size: 1.08rem;
-        }
-        @media (max-width: 700px) {
-            .config-panel { padding: 1.2rem 0.5rem; }
-            .setting-row { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
-        }
-    </style>
+    <link rel="stylesheet" href="configuracion.css">
+    <!-- Flag icons opcional -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons/css/flag-icons.min.css">
 </head>
 <body>
-<div class="config-panel shadow-lg">
-    <!-- Avatar y nombre -->
-    <div class="avatar-block">
-        <img src="https://i.pravatar.cc/150?img=3" alt="Avatar" class="avatar-img" id="avatarImg">
-        <br>
-        <button class="avatar-edit-btn" onclick="alert('Función de cambio de avatar próximamente');return false;">
-            <i class="fas fa-pen"></i> Cambiar avatar
+    <!-- Barra superior: Preferencias + Guardar Cambios -->
+    <div class="top-actions" style="position: absolute; top: 1rem; right: 11.5rem; z-index: 10; display: flex; gap: 2rem; align-items: center;">
+        <!-- Botón de inicio -->
+        <button class="btn btn-outline-dark btn-sm d-flex align-items-center gap-2" id="btnAtras" type="button" style="margin-right: 0.5rem;">
+            <i class="fas fa-arrow-left"></i>
+            <span data-i18n="atras">Atrás</span>
         </button>
-        <div class="mt-2" style="font-size:1.2rem;font-family:'Orbitron',Arial,sans-serif;">
-            <span id="userName">usuario123</span>
+        <!-- Botón de modo oscuro/claro -->
+        <button class="btn btn-outline-dark btn-sm d-flex align-items-center gap-2" id="btnModo" type="button" style="margin-right: 0.5rem;">
+            <i class="fas fa-moon" id="iconModo"></i>
+            <span id="textoModo" data-i18n="modo_oscuro">Modo oscuro</span>
+        </button>
+        <div class="dropdown">
+            <button class="btn btn-outline-dark btn-sm dropdown-toggle d-flex align-items-center gap-2"
+                type="button" id="btnPreferencias" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-sliders-h"></i>
+                <span data-i18n="preferencias">Preferencias</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="btnPreferencias">
+                <li>
+                    <button class="dropdown-item idioma-opcion" data-idioma="es">
+                        <span class="fi fi-es"></span> Español
+                    </button>
+                </li>
+                <li>
+                    <button class="dropdown-item idioma-opcion" data-idioma="en">
+                        <span class="fi fi-gb"></span> English
+                    </button>
+                </li>
+                <li>
+                    <button class="dropdown-item idioma-opcion" data-idioma="fr">
+                        <span class="fi fi-fr"></span> Français
+                    </button>
+                </li>
+                <li>
+                    <button class="dropdown-item idioma-opcion" data-idioma="de">
+                        <span class="fi fi-de"></span> Deutsch
+                    </button>
+                </li>
+            </ul>
         </div>
+        <button class="btn btn-save px-5 d-flex align-items-center gap-2" data-i18n="guardar" style="margin:0;" type="button">
+            Guardar Cambios
+            <i class="fas fa-save"></i>
+            <span data-i18n="guardar" class="d-none">Guardar Cambios</span>
+        </button>
     </div>
 
-    <!-- Datos personales -->
-    <div class="card-setting mb-4">
-        <div class="section-title"><i class="fas fa-user"></i> Datos personales</div>
-        <div class="setting-row">
-            <span class="setting-label">Correo electrónico</span>
-            <span id="userEmail">usuario@email.com</span>
-            <button class="btn btn-outline-info btn-sm" onclick="showEmailModal()"><i class="fas fa-pen"></i> Cambiar</button>
+    <div class="config-panel shadow-lg">
+        <!-- Avatar y nombre -->
+        <div class="avatar-block">
+            <img src="https://i.pravatar.cc/150?img=3" alt="Avatar" class="avatar-img" id="avatarImg">
+            <div id="userName">bienvendio</div>
         </div>
-        <div class="setting-row">
-            <span class="setting-label">Contraseña</span>
-            <span>••••••••</span>
-            <button class="btn btn-outline-info btn-sm" onclick="alert('Función de cambio de contraseña próximamente')"><i class="fas fa-key"></i> Cambiar</button>
-        </div>
-    </div>
 
-    <!-- Preferencias -->
-    <div class="card-setting mb-4">
-        <div class="section-title"><i class="fas fa-sliders-h"></i> Preferencias</div>
-        <div class="setting-row">
-            <span class="setting-label">Idioma</span>
-            <select class="form-select" id="language" style="max-width:180px;">
-                <option value="es">Español</option>
-                <option value="en">English</option>
-                <option value="fr">Français</option>
-                <option value="de">Deutsch</option>
-            </select>
-        </div>
-        <div class="setting-row">
-            <span class="setting-label">Fondo predeterminado</span>
-            <div class="bg-options">
-                <span class="bg-option" style="background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);" data-bg="blue"></span>
-                <span class="bg-option" style="background: linear-gradient(135deg, #fbbf24 0%, #f59e42 100%);" data-bg="orange"></span>
-                <span class="bg-option" style="background: linear-gradient(135deg, #a7f3d0 0%, #38bdf8 100%);" data-bg="aqua"></span>
-                <span class="bg-option" style="background: linear-gradient(135deg, #f472b6 0%, #a78bfa 100%);" data-bg="pink"></span>
+        <!-- Selector de avatar (oculto por defecto) -->
+        <div id="avatarSelector" class="avatar-selector d-none">
+            <div class="avatar-selector-inner">
+                <div class="avatar-list">
+                    <img src="https://i.pravatar.cc/150?img=3" class="avatar-option" alt="Avatar 1">
+                    <img src="https://i.pravatar.cc/150?img=5" class="avatar-option" alt="Avatar 2">
+                    <img src="https://i.pravatar.cc/150?img=7" class="avatar-option" alt="Avatar 3">
+                    <img src="https://i.pravatar.cc/150?img=8" class="avatar-option" alt="Avatar 4">
+                    <img src="https://i.pravatar.cc/150?img=10" class="avatar-option" alt="Avatar 5">
+                </div>
+                <button class="btn btn-outline-info btn-sm mt-2" id="closeAvatarSelector" data-i18n="cerrar">Cerrar</button>
             </div>
         </div>
-    </div>
 
-    <!-- Notificaciones -->
-    <div class="card-setting mb-4">
-        <div class="section-title"><i class="fas fa-bell"></i> Notificaciones</div>
-        <div class="setting-row">
-            <span class="setting-label">Alertas de precios</span>
-            <label class="switch">
-                <input type="checkbox" id="priceAlerts" checked>
-                <span class="slider"></span>
-            </label>
+        <!-- Fila de formularios -->
+        <div class="formularios-row">
+            <!-- Datos personales -->
+            <div class="card-setting datos-personales mb-4">
+                <div class="section-title"><i class="fas fa-user"></i> <span data-i18n="datos_personales">Datos personales</span></div>
+                <div class="setting-row">
+                    <span class="setting-label" data-i18n="correo">Correo electrónico</span>
+                    <span id="userEmail">usuario@email.com</span>
+                    <button class="btn btn-outline-info btn-sm" onclick="showEmailModal()" data-i18n="cambiar"><i class="fas fa-pen"></i> Cambiar</button>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label" data-i18n="contraseña">Contraseña</span>
+                    <span>••••••••</span>
+                    <button class="btn btn-outline-info btn-sm" onclick="alert('Función de cambio de contraseña próximamente')" data-i18n="cambiar"><i class="fas fa-key"></i> Cambiar</button>
+                </div>
+            </div>
+
+            <!-- Notificaciones -->
+            <div class="card-setting notificaciones mb-4">
+                <div class="section-title"><i class="fas fa-bell"></i> <span data-i18n="notificaciones">Notificaciones</span></div>
+                <div class="setting-row">
+                    <span class="setting-label" data-i18n="alertas_precios">Alertas de precios</span>
+                    <label class="switch">
+                        <input type="checkbox" id="priceAlerts" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label" data-i18n="novedades">Novedades y sugerencias</span>
+                    <label class="switch">
+                        <input type="checkbox" id="newsAlerts">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label" data-i18n="notificaciones_email">Notificaciones por email</span>
+                    <label class="switch">
+                        <input type="checkbox" id="emailAlerts" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
         </div>
-        <div class="setting-row">
-            <span class="setting-label">Novedades y sugerencias</span>
-            <label class="switch">
-                <input type="checkbox" id="newsAlerts">
-                <span class="slider"></span>
-            </label>
+
+        <!-- Sugerencias -->
+        <div class="card-setting suggestion-block mb-4">
+            <div class="section-title"><i class="fas fa-lightbulb"></i> <span data-i18n="sugerencias">Sugerencias para mejorar</span></div>
+            <textarea id="suggestions" placeholder="¿Qué te gustaría ver mejorado o agregado?" data-i18n-placeholder="placeholder_sugerencias"></textarea>
+            <button class="btn btn-outline-info btn-sm mt-2" onclick="alert('¡Gracias por tu sugerencia!')" data-i18n="enviar"><i class="fas fa-paper-plane"></i> Enviar</button>
         </div>
-        <div class="setting-row">
-            <span class="setting-label">Notificaciones por email</span>
-            <label class="switch">
-                <input type="checkbox" id="emailAlerts" checked>
-                <span class="slider"></span>
-            </label>
+
+        <!-- Suscripción -->
+        <div class="premium-card mb-4 text-center">
+            <i class="fas fa-crown fa-2x mb-2"></i>
+            <div style="font-size:1.15rem;"><strong>TrackYfi Premium</strong></div>
+            <div data-i18n="premium_desc">Accede a análisis avanzados, alertas ilimitadas y soporte prioritario.</div>
+            <button type="button" class="btn btn-light btn-sm mt-3" id="subscribeBtn" data-i18n="suscribirse"><i class="fas fa-star"></i> Suscribirse</button>
         </div>
     </div>
 
-    <!-- Sugerencias -->
-    <div class="card-setting suggestion-block mb-4">
-        <div class="section-title"><i class="fas fa-lightbulb"></i> Sugerencias para mejorar</div>
-        <textarea id="suggestions" placeholder="¿Qué te gustaría ver mejorado o agregado?"></textarea>
-        <button class="btn btn-outline-info btn-sm mt-2" onclick="alert('¡Gracias por tu sugerencia!')"><i class="fas fa-paper-plane"></i> Enviar</button>
-    </div>
-
-    <!-- Suscripción -->
-    <div class="premium-card mb-4 text-center">
-        <i class="fas fa-crown fa-2x mb-2"></i>
-        <div style="font-size:1.15rem;"><strong>TrackYfi Premium</strong></div>
-        <div>Accede a análisis avanzados, alertas ilimitadas y soporte prioritario.</div>
-        <button type="button" class="btn btn-light btn-sm mt-3" id="subscribeBtn"><i class="fas fa-star"></i> Suscribirse</button>
-    </div>
-
-    <div class="text-center">
-        <button class="btn btn-save px-5"><i class="fas fa-save"></i> Guardar Cambios</button>
-        <div id="configAlert" class="alert mt-3 d-none"></div>
-    </div>
-</div>
-
-<!-- Modal para cambiar email -->
-<div class="modal fade" id="emailModal" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content bg-dark text-light">
-      <div class="modal-header">
-        <h5 class="modal-title">Cambiar correo electrónico</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <input type="email" class="form-control" id="newEmail" placeholder="Nuevo correo">
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary" onclick="saveEmail()">Guardar</button>
+    <!-- Modal para cambiar email -->
+    <div class="modal fade" id="emailModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content bg-dark text-light">
+          <div class="modal-header">
+            <h5 class="modal-title" data-i18n="cambiar_correo">Cambiar correo electrónico</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <input type="email" class="form-control" id="newEmail" placeholder="Nuevo correo" data-i18n-placeholder="placeholder_nuevo_correo">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" onclick="saveEmail()" data-i18n="guardar">Guardar</button>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+    <script type="module" src="configuracion.js"></script>
 
-// Configuración real de tu proyecto
-const firebaseConfig = {
-  apiKey: "AIzaSyBj0vG5CgWxEBrvkNBMvMU9TFcKuqLP0cc",
-  authDomain: "trackyfi-317e1.firebaseapp.com",
-  projectId: "trackyfi-317e1",
-  storageBucket: "trackyfi-317e1.appspot.com",
-  messagingSenderId: "843779589124",
-  appId: "1:843779589124:web:d782b98668b1c16ce0a151",
-  measurementId: "G-9DQCFXXND3"
-};
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
 
-let currentUser = null;
-
-// Cargar datos del usuario al iniciar sesión
-onAuthStateChanged(auth, async user => {
-    if (user) {
-        currentUser = user;
-        // Lee los datos de Firestore
-        const docSnap = await getDoc(doc(db, "usuarios", user.uid));
-        if (docSnap.exists()) {
-            const data = docSnap.data();
-            document.getElementById('userName').textContent = data.nombre || user.displayName || '';
-            document.getElementById('userEmail').textContent = data.email || user.email || '';
-            document.getElementById('language').value = data.idioma || 'es';
-            document.getElementById('priceAlerts').checked = !!data.priceAlerts;
-            document.getElementById('newsAlerts').checked = !!data.newsAlerts;
-            document.getElementById('emailAlerts').checked = !!data.emailAlerts;
-            if (data.fondo) {
-                document.querySelectorAll('.bg-option').forEach(o => {
-                    o.classList.toggle('selected', o.dataset.bg === data.fondo);
-                });
-            }
-            if (data.sugerencia) {
-                document.getElementById('suggestions').value = data.sugerencia;
-            }
-        } else {
-            // Si no hay datos, muestra los del usuario de Auth
-            document.getElementById('userName').textContent = user.displayName || '';
-            document.getElementById('userEmail').textContent = user.email || '';
-        }
-    }
-});
-
-// Guardar configuración
-document.querySelector('.btn-save').addEventListener('click', async function(e) {
-    e.preventDefault();
-    if (!currentUser) return;
-    const data = {
-        nombre: document.getElementById('userName').textContent,
-        email: document.getElementById('userEmail').textContent,
-        idioma: document.getElementById('language').value,
-        priceAlerts: document.getElementById('priceAlerts').checked,
-        newsAlerts: document.getElementById('newsAlerts').checked,
-        emailAlerts: document.getElementById('emailAlerts').checked,
-        fondo: document.querySelector('.bg-option.selected')?.dataset.bg || 'blue',
-        sugerencia: document.getElementById('suggestions').value
-    };
-    await setDoc(doc(db, "usuarios", currentUser.uid), data, {merge:true});
-    const alertDiv = document.getElementById('configAlert');
-    alertDiv.className = 'alert alert-success mt-3 fade show';
-    alertDiv.textContent = "¡Configuración guardada correctamente!";
-    setTimeout(() => { alertDiv.className = 'alert mt-3 d-none'; }, 2500);
-});
-
-// Cambiar email desde modal
-window.saveEmail = async function() {
-    const newEmail = document.getElementById('newEmail').value;
-    if(newEmail && currentUser) {
-        await setDoc(doc(db, "usuarios", currentUser.uid), {email: newEmail}, {merge:true});
-        document.getElementById('userEmail').textContent = newEmail;
-        const alertDiv = document.getElementById('configAlert');
-        alertDiv.className = 'alert alert-success mt-3 fade show';
-        alertDiv.textContent = "¡Correo electrónico actualizado!";
-        setTimeout(() => { alertDiv.className = 'alert mt-3 d-none'; }, 2500);
-        const emailModal = bootstrap.Modal.getInstance(document.getElementById('emailModal'));
-        emailModal.hide();
-    } else {
-        alert('Por favor, ingresa un correo electrónico válido.');
-    }
-};
-
-// Fondo predeterminado interactivo
-document.querySelectorAll('.bg-option').forEach(opt => {
-    opt.addEventListener('click', function() {
-        document.querySelectorAll('.bg-option').forEach(o => o.classList.remove('selected'));
-        this.classList.add('selected');
-        let bg = this.getAttribute('data-bg');
-        let body = document.body;
-        if(bg === 'blue') body.style.background = "radial-gradient(ellipse at 60% 40%, #38bdf8 0%, #0ea5e9 40%, #1e293b 100%)";
-        if(bg === 'orange') body.style.background = "radial-gradient(ellipse at 60% 40%, #fbbf24 0%, #f59e42 40%, #1e293b 100%)";
-        if(bg === 'aqua') body.style.background = "radial-gradient(ellipse at 60% 40%, #a7f3d0 0%, #38bdf8 40%, #1e293b 100%)";
-        if(bg === 'pink') body.style.background = "radial-gradient(ellipse at 60% 40%, #f472b6 0%, #a78bfa 40%, #1e293b 100%)";
-    });
-});
-
-// Guardar configuración
-document.querySelector('.btn-save').addEventListener('click', async function(e) {
-    e.preventDefault();
-    if (!currentUser) return;
-    const data = {
-        nombre: document.getElementById('userName').textContent,
-        email: document.getElementById('userEmail').textContent,
-        idioma: document.getElementById('language').value,
-        priceAlerts: document.getElementById('priceAlerts').checked,
-        newsAlerts: document.getElementById('newsAlerts').checked,
-        emailAlerts: document.getElementById('emailAlerts').checked,
-        fondo: document.querySelector('.bg-option.selected')?.dataset.bg || 'blue',
-        sugerencia: document.getElementById('suggestions').value
-    };
-    await setDoc(doc(db, "usuarios", currentUser.uid), data, {merge:true});
-    const alertDiv = document.getElementById('configAlert');
-    alertDiv.className = 'alert alert-success mt-3 fade show';
-    alertDiv.textContent = "¡Configuración guardada correctamente!";
-    setTimeout(() => { alertDiv.className = 'alert mt-3 d-none'; }, 2500);
-});
-
-// Suscripción premium (simulación)
-document.getElementById('subscribeBtn').addEventListener('click', function() {
-    const alertDiv = document.getElementById('configAlert');
-    alertDiv.className = 'alert alert-info mt-3 fade show';
-    alertDiv.textContent = "¡Gracias por elegir Premium! Pronto recibirás un correo de confirmación.";
-    setTimeout(() => { alertDiv.className = 'alert mt-3 d-none'; }, 2500);
-});
-</script>
+</html></body>    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
