@@ -40,7 +40,7 @@
                 </a>
             </li>
             <li>
-                <a href="estadof.html" class="nav-link text-dark">
+                <a href="estado.html" class="nav-link text-dark">
                     <i class="fas fa-balance-scale me-2"></i> Estado financiero
                 </a>
             </li>
@@ -283,6 +283,40 @@
                     </div>
                     <div class="card-body">
                         <canvas id="weightedPerformanceChart" height="90"></canvas>
+                    </div>
+                </div>
+
+                <!-- Ajustes de Cuenta -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <i class="fas fa-cog me-2"></i>Ajustes de Cuenta
+                    </div>
+                    <div class="card-body">
+                        <!-- Datos Personales -->
+                        <div class="card-setting datos-personales mb-4">
+    <div class="section-title">
+        <i class="fas fa-user"></i>
+        <span data-i18n="datos_personales">Datos personales</span>
+    </div>
+    <div class="setting-row">
+        <span class="setting-label" data-i18n="correo">Correo electrónico</span>
+        <span id="userEmail">usuario@email.com</span>
+        <button class="btn btn-outline-info btn-sm d-flex align-items-center gap-2"
+                onclick="showEmailModal()" data-i18n="cambiar">
+            <i class="fas fa-pen"></i>
+            <span>Cambiar</span>
+        </button>
+    </div>
+    <div class="setting-row">
+        <span class="setting-label" data-i18n="contraseña">Contraseña</span>
+        <span>••••••••</span>
+        <button class="btn btn-outline-warning btn-sm d-flex align-items-center gap-2"
+                onclick="alert('Función de cambio de contraseña próximamente')" data-i18n="cambiar">
+            <i class="fas fa-key"></i>
+            <span>Cambiar</span>
+        </button>
+    </div>
+</div>
                     </div>
                 </div>
              

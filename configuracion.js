@@ -149,11 +149,23 @@ window.addEventListener('DOMContentLoaded', () => {
     traducirPagina(idioma);
 });
 
-// Cambiar notificaciones
+// Cambiar notificaciones (solo switches tipo switch, sin botones)
 ['priceAlerts', 'newsAlerts', 'emailAlerts'].forEach(id => {
-    document.getElementById(id).onchange = function() {
-        showConfigAlert('Preferencia de notificación actualizada', 'success');
-    };
+    const el = document.getElementById(id);
+    if (el) {
+        el.addEventListener('change', function() {
+            showConfigAlert(
+                `${el.parentElement.parentElement.querySelector('.setting-label').textContent.trim()} ${el.checked ? 'activado' : 'desactivado'}`,
+                'success'
+            );
+            localStorage.setItem('trackyfi_' + id, el.checked);
+        });
+        // Restaurar estado desde localStorage
+        const saved = localStorage.getItem('trackyfi_' + id);
+        if (saved !== null) {
+            el.checked = saved === 'true';
+        }
+    }
 });
 
 // Enviar sugerencia
@@ -190,6 +202,29 @@ window.saveEmail = function() {
 // Utilidad para mostrar alertas
 function showConfigAlert(msg, type = 'success') {
     const alertDiv = document.getElementById('configAlert');
+    if (!alertDiv) {
+        // Si no existe el div, crea uno flotante
+        let modal = document.createElement('div');
+        modal.style.position = 'fixed';
+        modal.style.top = '30px';
+        modal.style.right = '30px';
+        modal.style.background = type === 'success' ? '#18181b' : (type === 'danger' ? '#dc3545' : '#ffc107');
+        modal.style.color = '#fff';
+        modal.style.padding = '1.2rem 2rem';
+        modal.style.borderRadius = '14px';
+        modal.style.boxShadow = '0 4px 24px #18181b33';
+        modal.style.zIndex = '9999';
+        modal.style.fontSize = '1.1rem';
+        modal.style.fontWeight = 'bold';
+        modal.textContent = msg;
+        document.body.appendChild(modal);
+        setTimeout(() => {
+            modal.style.transition = 'opacity 0.5s';
+            modal.style.opacity = '0';
+            setTimeout(() => modal.remove(), 500);
+        }, 2200);
+        return;
+    }
     alertDiv.className = `alert alert-${type} mt-3 fade show`;
     alertDiv.textContent = msg;
     setTimeout(() => { alertDiv.className = 'alert mt-3 d-none'; }, 2500);

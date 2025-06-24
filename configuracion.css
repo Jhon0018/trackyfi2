@@ -48,25 +48,32 @@ body.dark-mode::after {
     opacity: 0.18;
 }
 
-/* ======== BARRA SUPERIOR ======== */
+/* ======== BARRA SUPERIOR ORDENADA Y RESPONSIVA ======== */
 .top-actions {
-    position: absolute;
-    top: 1rem;
-    left: 2.5rem; /* Barra alineada a la izquierda */
-    z-index: 10;
+    position: fixed;
+    top: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
     display: flex;
-    gap: 1.2rem; /* Espacio entre botones */
+    gap: 1.2rem;
     align-items: center;
+    background: rgba(255,255,255,0.95);
+    border-radius: 18px;
+    box-shadow: 0 4px 16px #18181b11;
+    padding: 0.7rem 2.5rem;
+    min-width: 340px;
+    max-width: 98vw;
+    width: max-content;
 }
-.top-actions > .dropdown,
-.top-actions > .btn-save {
-    flex-shrink: 0;
-}
+
+#btnAtras,
+#btnModo,
 #btnPreferencias,
 .btn-save {
     padding: 0.35rem 1.1rem;
     font-size: 0.98rem;
-    min-width: unset;
+    min-width: 110px;
     max-width: 180px;
     height: 38px;
     border-radius: 10px;
@@ -75,20 +82,43 @@ body.dark-mode::after {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
+    border: 1.5px solid #18181b;
+    background: #fff;
+    color: #18181b;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s, border 0.2s;
 }
+
+#btnAtras:hover, #btnModo:hover, #btnPreferencias:hover, .btn-save:hover,
+#btnAtras:focus, #btnModo:focus, #btnPreferencias:focus, .btn-save:focus {
+    background: #18181b;
+    color: #fff;
+    border-color: #18181b;
+    outline: none;
+}
+
 .btn-save {
     background: #18181b;
     color: #fff;
     border: none;
     font-weight: bold;
-    transition: background 0.2s, color 0.2s;
 }
 .btn-save:hover, .btn-save:focus {
     background: #fff;
     color: #18181b;
     border: 1.5px solid #18181b;
-    outline: none;
 }
+
+#btnModo .fa-moon, #btnModo .fa-sun {
+    transition: color 0.2s;
+}
+body.dark-mode #btnModo .fa-moon {
+    color: #facc15;
+}
+body:not(.dark-mode) #btnModo .fa-sun {
+    color: #18181b;
+}
+
 @media (max-width: 900px) {
     .top-actions {
         position: static;
@@ -100,12 +130,18 @@ body.dark-mode::after {
         max-width: 98vw;
         left: unset;
         right: unset;
+        transform: none;
+        padding: 0.7rem 0.5rem;
+        min-width: unset;
     }
+    #btnAtras,
+    #btnModo,
     #btnPreferencias,
     .btn-save {
         width: 100%;
         max-width: 100%;
         font-size: 1rem;
+        justify-content: center;
     }
 }
 
@@ -138,7 +174,7 @@ body.dark-mode .config-panel {
     align-items: center;
     justify-content: flex-start;
     margin-bottom: 1.5rem;
-    margin-top: 2.5rem; /* <-- Aumenta el margen superior para bajarlo */
+    margin-top: 2.5rem;
 }
 .avatar-img {
     width: 120px;
@@ -291,6 +327,74 @@ body.dark-mode .section-title {
     font-weight: 500;
     color: inherit;
     font-size: 1.07rem;
+    word-break: break-word;
+    flex: 1 1 100%;
+}
+
+/* ======== SWITCH BONITO PARA NOTIFICACIONES ======== */
+.switch-container {
+    width: 51px;
+    height: 31px;
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+}
+.checkbox {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+.switch {
+    width: 100%;
+    height: 100%;
+    display: block;
+    background-color: #e9e9eb;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    position: relative;
+}
+.slider {
+    width: 27px;
+    height: 27px;
+    position: absolute;
+    left: 4px;
+    top: 2px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.15), 0px 3px 1px rgba(0, 0, 0, 0.06);
+    transition: left 0.22s cubic-bezier(.4,0,.2,1), background 0.2s, box-shadow 0.2s, transform 0.18s;
+    cursor: pointer;
+    touch-action: pan-x;
+}
+.checkbox:checked + .switch {
+    background-color: #18181b;
+}
+.checkbox:checked + .switch .slider {
+    left: 20px;
+    background: #fff;
+}
+.switch,
+.slider {
+    user-select: none;
+    -webkit-user-select: none;
+}
+body.dark-mode .switch {
+    background-color: #444;
+}
+body.dark-mode .checkbox:checked + .switch {
+    background-color: #fff;
+}
+body.dark-mode .checkbox:checked + .switch .slider {
+    background: #18181b;
+}
+.switch:active .slider {
+    box-shadow: 0 1px 4px #8882 inset, 0 1px 2px #0001;
+    transform: scale(0.96);
+}
+.switch:active {
+    filter: brightness(0.97);
 }
 
 /* ======== SUGERENCIAS DEBAJO DE DATOS PERSONALES ======== */
@@ -387,127 +491,31 @@ body.dark-mode .premium-card {
     max-width: 220px;
 }
 
-/* ======== SWITCH ======== */
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 48px;
-    height: 26px;
-}
-.switch input { display: none; }
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: #ccc;
-    transition: .4s;
-    border-radius: 26px;
-}
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 20px; width: 20px;
-    left: 3px; bottom: 3px;
-    background: #18181b;
-    transition: .4s;
-    border-radius: 50%;
-    box-shadow: 0 0 8px #18181b22;
-}
-input:checked + .slider {
-    background: #18181b;
-}
-input:checked + .slider:before {
-    transform: translateX(22px);
-    background: #fff;
-}
-body.dark-mode .slider {
-    background: #444;
-}
-body.dark-mode .slider:before {
-    background: #fff;
-}
-body.dark-mode input:checked + .slider {
-    background: #fff;
-}
-body.dark-mode input:checked + .slider:before {
-    background: #18181b;
-}
-
-/* ======== ALERTAS ======== */
-.alert {
-    border-radius: 12px;
-    font-size: 1.08rem;
-    background: #fff;
-    color: #18181b;
-    border: 1.5px solid #18181b;
-    width: 100%;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-    align-self: center;
-    margin-top: 1.5rem;
-}
-body.dark-mode .alert {
-    background: #23232a;
-    color: #fff;
-    border-color: #fff;
-}
-
-/* ======== TIPOGRAFÍA RESPONSIVA ======== */
-html {
-    font-size: 16px;
-}
-@media (max-width: 1200px) {
-    html {
-        font-size: 15px;
-    }
-}
-@media (max-width: 900px) {
-    html {
-        font-size: 14px;
-    }
-}
-@media (max-width: 700px) {
-    html {
-        font-size: 13px;
-    }
-}
-@media (max-width: 500px) {
-    html {
-        font-size: 12px;
-    }
-}
-.section-title {
-    font-size: 1.18rem;
-}
-.btn,
-.btn-save,
-.btn-outline-info,
-.btn-light,
-.btn-primary {
-    font-size: 1rem;
-}
-@media (max-width: 700px) {
-    .section-title {
-        font-size: 1.05rem;
-    }
-    .btn,
-    .btn-save,
-    .btn-outline-info,
-    .btn-light,
-    .btn-primary {
-        font-size: 0.97rem;
-    }
-}
-
 /* ======== RESPONSIVE ======== */
-@media (max-width: 1200px) {
-    .config-panel {
-        max-width: 98vw;
-        padding: 2rem 1rem;
-    }
-}
 @media (max-width: 900px) {
+    .top-actions {
+        position: static;
+        margin: 0 auto 1.2rem auto;
+        flex-direction: column;
+        gap: 0.7rem;
+        align-items: stretch;
+        width: 100%;
+        max-width: 98vw;
+        left: unset;
+        right: unset;
+        transform: none;
+        padding: 0.7rem 0.5rem;
+        min-width: unset;
+    }
+    #btnAtras,
+    #btnModo,
+    #btnPreferencias,
+    .btn-save {
+        width: 100%;
+        max-width: 100%;
+        font-size: 1rem;
+        justify-content: center;
+    }
     .config-panel {
         padding: 1.5rem 0.5rem;
     }
@@ -535,22 +543,18 @@ html {
         padding: 1.2rem 1rem;
         box-sizing: border-box;
     }
-
     .formularios-row {
         flex-direction: column;
         align-items: center;
         gap: 1.5rem;
     }
-
     .section-title {
         text-align: center;
         width: 100%;
     }
-
     .avatar-block {
         margin-bottom: 1.2rem;
     }
-
     .avatar-img {
         width: 100px;
         height: 100px;
@@ -572,14 +576,12 @@ html {
     .config-panel {
         padding: 1rem;
     }
-
     .top-actions {
         flex-direction: column;
         align-items: stretch;
         gap: 0.5rem;
         padding: 0 1rem;
     }
-
     .btn-save,
     .btn-outline-info,
     #btnPreferencias {
@@ -587,157 +589,146 @@ html {
         height: 40px;
         width: 100%;
     }
-
     .section-title {
         font-size: 1rem;
     }
-}
-
-/* ======== MEJORAS ADICIONALES RESPONSIVAS PROFESIONALES ======== */
-
-/* Centrado y espaciado global */
-.config-panel {
-    box-sizing: border-box;
-    width: 95%;
-    max-width: 1200px;
-    padding: 2.5rem;
-    margin: 4rem auto;
-}
-
-/* Alineación y flow responsivo para filas */
-.formularios-row {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: flex-start;
-    gap: 2rem;
-}
-
-/* Ajustes para tarjetas en móviles */
-@media (max-width: 768px) {
-    .card-setting,
-    .premium-card,
-    .suggestion-block,
-    .alert {
-        max-width: 100%;
-        padding: 1.2rem 1rem;
-        box-sizing: border-box;
-    }
-
-    .formularios-row {
-        flex-direction: column;
-        align-items: center;
-        gap: 1.5rem;
-    }
-
-    .section-title {
-        text-align: center;
-        width: 100%;
-    }
-
-    .avatar-block {
-        margin-bottom: 1.2rem;
-    }
-
-    .avatar-img {
-        width: 100px;
-        height: 100px;
-    }
-}
-
-/* Ajuste para móviles muy pequeños */
-@media (max-width: 480px) {
-    .config-panel {
-        padding: 1rem;
-    }
-
-    .top-actions {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0.5rem;
-        padding: 0 1rem;
-    }
-
-    .btn-save,
-    .btn-outline-info,
-    #btnPreferencias {
-        font-size: 0.95rem;
-        height: 40px;
-        width: 100%;
-    }
-
-    .section-title {
-        font-size: 1rem;
-    }
-}
-
-/* Mejora en consistencia de botones */
-.btn,
-.btn-save,
-.btn-outline-info,
-.btn-light,
-.btn-primary {
-    width: 100%;
-    max-width: 220px;
-    margin: 0 auto;
-}
-
-/* Corrección de texto que se sale en móviles */
-.setting-label {
-    word-break: break-word;
-    flex: 1 1 100%;
-}
-
-/* Evita que la imagen de avatar deforme la UI */
-.avatar-img,
-.avatar-option {
-    max-width: 100%;
-    height: auto;
-}
-
-/* Botón de inicio y modo oscuro/claro */
-#btnInicio, #btnModo {
-    min-width: 110px;
-    font-weight: 500;
-    border-radius: 10px;
-    transition: background 0.2s, color 0.2s;
-}
-#btnModo .fa-moon, #btnModo .fa-sun {
-    transition: color 0.2s;
-}
-body.dark-mode #btnModo .fa-moon {
-    color: #facc15;
-}
-body:not(.dark-mode) #btnModo .fa-sun {
-    color: #18181b;
-}
-#btnModo.active, #btnInicio.active {
-    background: #18181b;
-    color: #fff;
-    border: 1.5px solid #18181b;
-}
-body.dark-mode #btnModo.active {
-    background: #fff;
-    color: #18181b;
-    border: 1.5px solid #fff;
-}
-#btnInicio:hover, #btnModo:hover {
-    background: #e0e7ff;
-    color: #18181b;
-}
-body.dark-mode #btnInicio:hover, body.dark-mode #btnModo:hover {
-    background: #23232a;
-    color: #fff;
 }
 
 /* Botón "Atrás" más a la izquierda, separado del resto */
 #btnAtras {
-    margin-right: 2.5rem !important; /* Más espacio a la derecha */
+    margin-right: 2.5rem !important;
 }
-
-/* Si quieres aún más separación en pantallas grandes */
 @media (min-width: 1200px) {
     #btnAtras {
         margin-right: 4rem !important;
     }
+}
+
+/* Orden y estructura mejorada para datos personales */
+.datos-personales {
+    width: 100%;
+    max-width: 420px;
+    margin: 2rem auto;
+    padding: 1.5rem 2rem;
+    background: rgba(255,255,255,0.93);
+    border-radius: 18px;
+    box-shadow: 0 2px 16px #18181b11;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+body.dark-mode .datos-personales {
+    background: #23232a;
+    color: #fff;
+    border-color: #fff;
+}
+.datos-personales .section-title {
+    font-family: 'Orbitron', Arial, sans-serif;
+    color: #18181b;
+    font-size: 1.18rem;
+    margin-bottom: 1rem;
+    letter-spacing: 1px;
+}
+body.dark-mode .datos-personales .section-title {
+    color: #fff;
+}
+.datos-personales .setting-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+}
+.datos-personales .setting-label {
+    font-weight: 500;
+    color: inherit;
+    font-size: 1.07rem;
+    word-break: break-word;
+    flex: 1 1 100%;
+}
+.btn-outline-info.btn-sm {
+    padding: 0.35rem 0.7rem;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border: 1.5px solid #18181b;
+    background: #fff;
+    color: #18181b;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s, border 0.2s;
+}
+.btn-outline-info.btn-sm:hover, .btn-outline-info.btn-sm:focus {
+    background: #18181b;
+    color: #fff;
+    border-color: #18181b;
+    outline: none;
+}
+.btn-outline-warning.btn-sm {
+    padding: 0.35rem 0.7rem;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border: 1.5px solid #eab308;
+    background: #fef9c3;
+    color: #18181b;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s, border 0.2s;
+}
+.btn-outline-warning.btn-sm:hover, .btn-outline-warning.btn-sm:focus {
+    background: #18181b;
+    color: #fff;
+    border-color: #18181b;
+    outline: none;
+}
+
+/* Orden y estructura mejorada para notificaciones */
+.card-setting.notificaciones {
+    background: #f8f9fa;
+    border-radius: 18px;
+    box-shadow: 0 2px 16px #18181b11;
+    border: 1.5px solid #18181b;
+    padding: 1.5rem 2rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+body.dark-mode .card-setting.notificaciones {
+    background: #23232a;
+    color: #fff;
+    border-color: #fff;
+}
+.card-setting.notificaciones .section-title {
+    font-family: 'Orbitron', Arial, sans-serif;
+    color: #18181b;
+    font-size: 1.18rem;
+    margin-bottom: 1rem;
+    letter-spacing: 1px;
+}
+body.dark-mode .card-setting.notificaciones .section-title {
+    color: #fff;
+}
+.card-setting.notificaciones .setting-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+}
+.card-setting.notificaciones .setting-label {
+    font-weight: 500;
+    color: inherit;
+    font-size: 1.07rem;
+    word-break: break-word;
+    flex: 1 1 100%;
 }
