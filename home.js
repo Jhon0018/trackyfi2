@@ -19,6 +19,7 @@ const db = getFirestore(app);
 let currentUserId = null;
 let portfolioData = JSON.parse(localStorage.getItem('portfolioData') || '[]');
 let profitPieChart, profitBarChart, weightedPerformanceChartInstance = null;
+let capitalLineChartInstance = null;
 
 // Utilidades
 function savePortfolio() {
@@ -194,6 +195,98 @@ function renderWeightedPerformanceChart(type = 'performance') {
     });
 }
 
+function renderCapitalLineChart() {
+    if (!window.Chart) return;
+
+    const ctx = document.getElementById('capitalLineChart').getContext('2d');
+    if (capitalLineChartInstance) capitalLineChartInstance.destroy();
+
+    if (!portfolioData.length) {
+        capitalLineChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Sin datos'],
+                datasets: [{
+                    label: 'Evolución Capital Total',
+                    data: [0],
+                    fill: true,
+                    borderColor: '#2563eb',
+                    backgroundColor: 'rgba(37,99,235,0.1)',
+                    tension: 0.4,
+                    pointRadius: 2,
+                    pointBackgroundColor: '#2563eb'
+                }]
+            }
+        });
+        return;
+    }
+
+    // Si hay fechas, ordena por fecha; si no, usa el orden de ingreso
+    let sorted = [];
+    if (portfolioData.some(a => a.purchase_date)) {
+        sorted = [...portfolioData]
+            .filter(a => a.purchase_date)
+            .sort((a, b) => new Date(a.purchase_date) - new Date(b.purchase_date));
+    } else {
+        sorted = [...portfolioData];
+    }
+
+    let labels = [];
+    let data = [];
+    let acumulado = 0;
+
+    sorted.forEach(asset => {
+        const profit = (asset.profit !== null && !isNaN(asset.profit)) ? asset.profit : 0;
+        acumulado += profit;
+        labels.push(asset.purchase_date || asset.name);
+        data.push(acumulado);
+    });
+
+    // Si sigue sin datos, muestra un punto plano
+    if (data.length === 0) {
+        labels = ['Sin datos'];
+        data = [0];
+    }
+
+    capitalLineChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Evolución Ganancia/Pérdida Acumulada',
+                data: data,
+                fill: true,
+                borderColor: '#2563eb',
+                backgroundColor: 'rgba(37,99,235,0.1)',
+                tension: 0.4,
+                pointRadius: 2,
+                pointBackgroundColor: '#2563eb'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: { enabled: true }
+            },
+            scales: {
+                x: {
+                    title: { display: true, text: 'Fecha o Activo' }
+                },
+                y: {
+                    beginAtZero: true,
+                    title: { display: true, text: 'Ganancia/Pérdida Acumulada' },
+                    ticks: {
+                        callback: function(value) {
+                            return value.toLocaleString('es-CO', { style: 'currency', currency: 'USD' });
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
 // Portafolio
 function renderPortfolio() {
     const container = document.getElementById('portfolioContent');
@@ -265,7 +358,7 @@ function renderPortfolio() {
                     <button class="btn btn-danger btn-sm me-1" onclick="window.deleteAsset(${idx})">
                         <i class="fas fa-trash"></i>
                     </button>
-                    <button class="btn btn-primary btn-sm" onclick="window.handleUpdatePrice(${idx})">
+                    <button class="btn btn-primary btn-sm" onclick="window.handleUpdatePriceByISIN('${asset.isin}')">
                         <i class="fas fa-sync-alt"></i> Actualizar
                     </button>
                 </td>
@@ -280,14 +373,22 @@ function renderPortfolio() {
     container.innerHTML = tableHTML;
     renderCharts();
     renderWeightedPerformanceChart('performance');
+    renderCapitalLineChart();
 }
 
 // CRUD
 async function addAsset(formData) {
+    // Verifica si ya existe un activo con el mismo ISIN
+    if (formData.isin && portfolioData.some(asset => asset.isin === formData.isin)) {
+        showAlert('Ya tienes un activo con este ISIN en tu portafolio.', 'warning');
+        return;
+    }
+
     const newAsset = {
         userId: currentUserId,
         name: formData.name,
         ticker: formData.ticker || 'N/A',
+        isin: formData.isin || '', // Asegúrate de guardar el ISIN aquí
         type: 'stock',
         quantity: parseFloat(formData.quantity),
         purchase_price: parseFloat(formData.purchase_price),
@@ -303,7 +404,7 @@ async function addAsset(formData) {
     };
 
     // Obtener precio actual automáticamente
-    newAsset.current_price = await getCurrentPriceYahoo(newAsset.ticker);
+    newAsset.current_price = await getCurrentPriceYahoo(newAsset.isin);
     if (newAsset.current_price !== null && newAsset.current_price !== undefined) {
         newAsset.value = newAsset.quantity * newAsset.current_price;
         newAsset.profit = newAsset.value - (newAsset.quantity * newAsset.purchase_price) - newAsset.commission;
@@ -376,7 +477,7 @@ async function addCrypto(formData) {
         savePortfolio();
         updateStats();
         renderPortfolio();
-        showAlert('Esta criptomoneda no existe o el id es incorrecto.', 'danger');
+        showAlert('Esta criptomoneda no existe o el ticker es incorrecto.', 'danger');
     }
 }
 
@@ -622,7 +723,7 @@ window.updateAssetPrice = async function(idx) {
             return;
         }
     } else {
-        price = await getCurrentPriceYahoo(asset.ticker);
+        price = await getCurrentPriceYahoo(asset.isin);
         if (price === null || price === undefined) {
             asset.current_price = null;
             asset.value = null;
@@ -644,10 +745,12 @@ window.updateAssetPrice = async function(idx) {
     showAlert(`Precio actualizado para ${asset.name}: ${formatCurrency(price)}`, 'success');
 };
 
-// Agrega esta función al final de tu archivo JS:
-window.handleUpdatePrice = async function(idx) {
-    const asset = portfolioData[idx];
-    if (!asset) return;
+window.updateAssetPriceByISIN = async function(isin) {
+    const asset = portfolioData.find(a => a.isin === isin);
+    if (!asset) {
+        showAlert('No se encontró el activo con ese ISIN.', 'danger');
+        return;
+    }
 
     let price = null;
     if (asset.type === "crypto") {
@@ -663,7 +766,7 @@ window.handleUpdatePrice = async function(idx) {
             return;
         }
     } else {
-        price = await getCurrentPriceYahoo(asset.ticker);
+        price = await getCurrentPriceYahoo(asset.isin);
         if (price === null || price === undefined) {
             asset.current_price = null;
             asset.value = null;
@@ -671,11 +774,10 @@ window.handleUpdatePrice = async function(idx) {
             savePortfolio();
             updateStats();
             renderPortfolio();
-            showAlert(`El activo "${asset.ticker}" no existe o el ticker es incorrecto.`, 'danger');
+            showAlert(`El activo con ISIN "${asset.isin}" no existe o el ticker es incorrecto.`, 'danger');
             return;
         }
     }
-
     asset.current_price = price;
     asset.value = asset.quantity * asset.current_price;
     asset.profit = asset.value - (asset.quantity * asset.purchase_price) - (asset.commission || 0);
