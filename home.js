@@ -326,11 +326,11 @@ function renderPortfolio() {
 
         // Si el precio actual es null, muestra mensaje de error en la tabla
         const priceActual = (asset.current_price === null || asset.current_price === undefined)
-            ? '<span class="text-danger">No existe</span>'
+            ? `<span class="text-danger">${asset.priceError || 'No existe'}</span>`
             : formatCurrency(asset.current_price);
 
         const profitValue = (asset.current_price === null || asset.current_price === undefined)
-            ? '<span class="text-danger">No existe</span>'
+            ? `<span class="text-danger">${asset.priceError || 'No existe'}</span>`
             : `<span class="${profitClass}">${formatCurrency(asset.profit)}</span>`;
 
         tableHTML += `
@@ -403,32 +403,18 @@ async function addAsset(formData) {
         created: new Date()
     };
 
-    // Obtener precio actual automáticamente
-    newAsset.current_price = await getCurrentPriceYahoo(newAsset.isin);
-    if (newAsset.current_price !== null && newAsset.current_price !== undefined) {
-        newAsset.value = newAsset.quantity * newAsset.current_price;
-        newAsset.profit = newAsset.value - (newAsset.quantity * newAsset.purchase_price) - newAsset.commission;
-        portfolioData.push(newAsset);
-        savePortfolio();
-        updateStats();
-        renderPortfolio();
-        showAlert('Activo agregado exitosamente', 'success');
-        // Guardar en Firestore
-        if (currentUserId) {
-            try {
-                await addDoc(collection(db, "activo"), newAsset);
-            } catch (e) {
-                showAlert('No se pudo guardar en la nube: ' + e.message, 'danger');
-            }
+    portfolioData.push(newAsset);
+    savePortfolio();
+    updateStats();
+    renderPortfolio();
+    showAlert('Activo agregado exitosamente', 'success');
+    // Guardar en Firestore
+    if (currentUserId) {
+        try {
+            await addDoc(collection(db, "activo"), newAsset);
+        } catch (e) {
+            showAlert('No se pudo guardar en la nube: ' + e.message, 'danger');
         }
-    } else {
-        newAsset.value = null;
-        newAsset.profit = null;
-        portfolioData.push(newAsset);
-        savePortfolio();
-        updateStats();
-        renderPortfolio();
-        showAlert('Este activo no existe o el ticker es incorrecto.', 'danger');
     }
 }
 
@@ -452,32 +438,18 @@ async function addCrypto(formData) {
         created: new Date()
     };
 
-    // Obtener precio actual automáticamente
-    newCrypto.current_price = await getCurrentPriceCrypto(cryptoId.toLowerCase(), (newCrypto.currency || 'usd').toLowerCase());
-    if (newCrypto.current_price !== null && newCrypto.current_price !== undefined) {
-        newCrypto.value = newCrypto.quantity * newCrypto.current_price;
-        newCrypto.profit = newCrypto.value - (newCrypto.quantity * newCrypto.purchase_price) - newCrypto.commission;
-        portfolioData.push(newCrypto);
-        savePortfolio();
-        updateStats();
-        renderPortfolio();
-        showAlert('Criptomoneda agregada exitosamente', 'success');
-        // Guardar en Firestore
-        if (currentUserId) {
-            try {
-                await addDoc(collection(db, "cripto"), newCrypto);
-            } catch (e) {
-                showAlert('No se pudo guardar en la nube: ' + e.message, 'danger');
-            }
+    portfolioData.push(newCrypto);
+    savePortfolio();
+    updateStats();
+    renderPortfolio();
+    showAlert('Criptomoneda agregada exitosamente', 'success');
+    // Guardar en Firestore
+    if (currentUserId) {
+        try {
+            await addDoc(collection(db, "cripto"), newCrypto);
+        } catch (e) {
+            showAlert('No se pudo guardar en la nube: ' + e.message, 'danger');
         }
-    } else {
-        newCrypto.value = null;
-        newCrypto.profit = null;
-        portfolioData.push(newCrypto);
-        savePortfolio();
-        updateStats();
-        renderPortfolio();
-        showAlert('Esta criptomoneda no existe o el ticker es incorrecto.', 'danger');
     }
 }
 
@@ -530,6 +502,9 @@ window.viewDetails = function(idx) {
             <strong>Ticker:</strong> ${asset.ticker}
         </div>
         <div class="mb-3">
+            <strong>ISIN:</strong> ${asset.isin || 'N/A'}
+        </div>
+        <div class="mb-3">
             <strong>Cantidad:</strong> ${asset.quantity}
         </div>
         <div class="mb-3">
@@ -553,7 +528,6 @@ window.viewDetails = function(idx) {
         <div class="mb-3">
             <strong>Notas:</strong> ${asset.notes || 'N/A'}
         </div>
-        
         <div class="mb-3">
             <strong>Comisión:</strong> ${asset.commission ? formatCurrency(asset.commission) : formatCurrency(0)}
         </div>
@@ -670,28 +644,6 @@ onAuthStateChanged(auth, (user) => {
 updateStats();
 renderPortfolio();
 
-// Para acciones (stocks)
-async function getCurrentPriceYahoo(symbol) {
-    const url = `https://apidojo-yahoo-finance-v1.p.rapidapi.com/market/v2/get-quotes?symbols=${symbol}&region=US`;
-    const options = {
-        method: 'GET',
-        headers: {
-            'x-rapidapi-host': 'apidojo-yahoo-finance-v1.p.rapidapi.com',
-            'x-rapidapi-key': '86e6592280mshb63eb4f106fe42cp14510djsn915f913aba12'
-        }
-    };
-    try {
-        const res = await fetch(url, options);
-        const data = await res.json();
-        if (data?.quoteResponse?.result?.length > 0) {
-            return data.quoteResponse.result[0].regularMarketPrice;
-        }
-        return null;
-    } catch (e) {
-        return null;
-    }
-}
-
 // Para criptomonedas (CoinGecko)
 async function getCurrentPriceCrypto(cryptoId, currency = 'usd') {
     const url = `https://api.coingecko.com/api/v3/simple/price?ids=${cryptoId}&vs_currencies=${currency}`;
@@ -723,7 +675,7 @@ window.updateAssetPrice = async function(idx) {
             return;
         }
     } else {
-        price = await getCurrentPriceYahoo(asset.isin);
+        price = await getCurrentPriceByISIN(asset.isin);
         if (price === null || price === undefined) {
             asset.current_price = null;
             asset.value = null;
@@ -766,7 +718,7 @@ window.updateAssetPriceByISIN = async function(isin) {
             return;
         }
     } else {
-        price = await getCurrentPriceYahoo(asset.isin);
+        price = await getCurrentPriceByISIN(asset.isin);
         if (price === null || price === undefined) {
             asset.current_price = null;
             asset.value = null;
@@ -787,59 +739,104 @@ window.updateAssetPriceByISIN = async function(isin) {
     showAlert(`Precio actualizado para ${asset.name}: ${formatCurrency(price)}`, 'success');
 };
 
-// Inicializa el tooltip de Bootstrap para el botón premium
-document.addEventListener('DOMContentLoaded', function () {
-    var premiumBtn = document.getElementById('sidebarPremiumBtn');
-    if (premiumBtn) {
-        new bootstrap.Tooltip(premiumBtn);
+async function getCurrentPriceByISIN(isin) {
+    const url = "https://api.openfigi.com/v3/mapping";
+    const headers = {
+        "Content-Type": "application/json",
+        "X-OPENFIGI-APIKEY": "65268840c9ff36.28158167"
+    };
+    const body = JSON.stringify([{ idType: "ID_ISIN", idValue: isin }]);
+    try {
+        const res = await fetch(url, {
+            method: "POST",
+            headers,
+            body
+        });
+        if (!res.ok) {
+            showAlert('Error al consultar OpenFIGI: ' + res.statusText, 'danger');
+            return null;
+        }
+        const data = await res.json();
+        if (!data || !data[0] || !data[0].data || data[0].data.length === 0) {
+            showAlert('OpenFIGI no devolvió datos para el ISIN ingresado.', 'warning');
+            return null;
+        }
+        const ticker = data[0].data[0].ticker;
+        const exchCode = data[0].data[0].exchCode || "US";
+        if (!ticker) {
+            showAlert('OpenFIGI no devolvió un ticker para el ISIN ingresado.', 'warning');
+            return null;
+        }
+
+        // 1. Intenta Alpha Vantage
+        let price = await getPriceByAlphaVantage(ticker, exchCode);
+        if (price !== null && price !== undefined && !isNaN(price)) {
+            showAlert('Precio obtenido correctamente desde Alpha Vantage.', 'success');
+            return price;
+        } else {
+            showAlert('Alpha Vantage no devolvió precio para el ticker: ' + ticker, 'warning');
+        }
+
+        // 2. Si falla, intenta Yahoo Finance
+        price = await getPriceByYahooFinance(ticker, exchCode);
+        if (price !== null && price !== undefined && !isNaN(price)) {
+            showAlert('Precio obtenido correctamente desde Yahoo Finance.', 'success');
+            return price;
+        } else {
+            showAlert('Yahoo Finance no devolvió precio para el ticker: ' + ticker, 'warning');
+        }
+
+        // 3. Aquí puedes agregar más proveedores si tienes API key
+        showAlert('No se pudo obtener el precio actual del activo con el ISIN proporcionado.', 'danger');
+        return null;
+    } catch (e) {
+        showAlert('Error en la consulta de precio por ISIN: ' + (e.message || e), 'danger');
+        return null;
     }
-});
+}
 
-// Botones para alternar entre rendimiento (%) y valor total
-document.getElementById('showWeightedPerformanceChart').addEventListener('click', function() {
-    renderWeightedPerformanceChart('performance');
-    this.classList.replace('btn-outline-primary', 'btn-primary');
-    document.getElementById('showTotalValueChart').classList.replace('btn-primary', 'btn-outline-secondary');
-});
-document.getElementById('showTotalValueChart').addEventListener('click', function() {
-    renderWeightedPerformanceChart('value');
-    this.classList.replace('btn-outline-secondary', 'btn-primary');
-    document.getElementById('showWeightedPerformanceChart').classList.replace('btn-primary', 'btn-outline-primary');
-});
-
-// Descargar gráfica como imagen siempre en modo claro
-document.getElementById('downloadChartBtn').onclick = function() {
-    const chartCanvas = document.getElementById('weightedPerformanceChart');
-    const wasDark = document.body.classList.contains('dark-mode');
-
-    // Si está en modo oscuro, cambia temporalmente a modo claro
-    if (wasDark) {
-        document.body.classList.remove('dark-mode');
-        // Espera a que los estilos se apliquen antes de exportar
-        setTimeout(() => {
-            const url = chartCanvas.toDataURL('image/png');
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'grafica_rendimiento.png';
-            a.click();
-            // Vuelve a modo oscuro
-            document.body.classList.add('dark-mode');
-        }, 300); // 300ms para asegurar el cambio de estilos
-    } else {
-        const url = chartCanvas.toDataURL('image/png');
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'grafica_rendimiento.png';
-        a.click();
+// Alpha Vantage
+async function getPriceByAlphaVantage(ticker, exchCode = "US") {
+    const apiKey = "ZRDVOJKXEOSCNTM9";
+    const symbol = exchCode && exchCode !== "US" ? `${ticker}.${exchCode}` : ticker;
+    const url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${apiKey}`;
+    try {
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data && data["Global Quote"] && data["Global Quote"]["05. price"]) {
+            return parseFloat(data["Global Quote"]["05. price"]);
+        }
+        return null;
+    } catch (e) {
+        return null;
     }
-};
+}
 
-// Refrescar datos de la gráfica
-document.getElementById('refreshChartBtn').onclick = function() {
-    renderWeightedPerformanceChart(); // O la función que uses para actualizar
-};
-
-// Mostrar ayuda
-document.getElementById('helpChartBtn').onclick = function() {
-    alert('Esta gráfica muestra el rendimiento ponderado (%) o el valor total de tus inversiones. Usa los botones para alternar la vista.');
-};
+// Yahoo Finance (sin API key, solo para precios de referencia, puede estar limitado)
+async function getPriceByYahooFinance(ticker, exchCode = "US") {
+    // Yahoo Finance espera el símbolo con sufijo de exchange, por ejemplo: VWRL.L, VWRL.AS, etc.
+    let symbol = ticker;
+    if (exchCode && exchCode !== "US") {
+        // Algunos sufijos comunes: XLON -> L, XAMS -> AS, XETR -> DE, etc.
+        const map = { XLON: "L", XAMS: "AS", XETR: "DE", XNAS: "", XNYS: "" };
+        const suffix = map[exchCode] !== undefined ? map[exchCode] : exchCode;
+        symbol = `${ticker}.${suffix}`;
+    }
+    const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbol}`;
+    try {
+        const res = await fetch(url);
+        const data = await res
+        if (
+            data &&
+            data.quoteResponse &&
+            data.quoteResponse.result &&
+            data.quoteResponse.result.length > 0 &&
+            data.quoteResponse.result[0].regularMarketPrice
+        ) {
+            return data.quoteResponse.result[0].regularMarketPrice;
+        }
+        return null;
+    } catch (e) {
+        return null;
+    }
+}
