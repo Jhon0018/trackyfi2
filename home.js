@@ -326,11 +326,11 @@ function renderPortfolio() {
 
         // Si el precio actual es null, muestra mensaje de error en la tabla
         const priceActual = (asset.current_price === null || asset.current_price === undefined)
-            ? `<span class="text-danger">${asset.priceError || 'No existe'}</span>`
+            ? `<span class="text-danger">${asset.priceError || 'No se pudo obtener el precio. Consulta detalles.'}</span>`
             : formatCurrency(asset.current_price);
 
         const profitValue = (asset.current_price === null || asset.current_price === undefined)
-            ? `<span class="text-danger">${asset.priceError || 'No existe'}</span>`
+            ? `<span class="text-danger">${asset.priceError || 'No se pudo obtener el precio. Consulta detalles.'}</span>`
             : `<span class="${profitClass}">${formatCurrency(asset.profit)}</span>`;
 
         tableHTML += `
@@ -388,7 +388,7 @@ async function addAsset(formData) {
         userId: currentUserId,
         name: formData.name,
         ticker: formData.ticker || 'N/A',
-        isin: formData.isin || '', // Asegúrate de guardar el ISIN aquí
+        isin: formData.isin || '',
         type: 'stock',
         quantity: parseFloat(formData.quantity),
         purchase_price: parseFloat(formData.purchase_price),
@@ -403,18 +403,24 @@ async function addAsset(formData) {
         created: new Date()
     };
 
-    portfolioData.push(newAsset);
-    savePortfolio();
-    updateStats();
-    renderPortfolio();
-    showAlert('Activo agregado exitosamente', 'success');
-    // Guardar en Firestore
     if (currentUserId) {
         try {
             await addDoc(collection(db, "activo"), newAsset);
+            // Solo después de guardar en Firestore, actualiza el historial local
+            portfolioData.push(newAsset);
+            savePortfolio();
+            updateStats();
+            renderPortfolio();
+            showAlert('Activo agregado exitosamente', 'success');
         } catch (e) {
             showAlert('No se pudo guardar en la nube: ' + e.message, 'danger');
         }
+    } else {
+        portfolioData.push(newAsset);
+        savePortfolio();
+        updateStats();
+        renderPortfolio();
+        showAlert('Activo agregado exitosamente', 'success');
     }
 }
 
@@ -511,7 +517,11 @@ window.viewDetails = function(idx) {
             <strong>Precio de Compra:</strong> ${formatCurrency(asset.purchase_price)}
         </div>
         <div class="mb-3">
-            <strong>Precio Actual:</strong> ${formatCurrency(asset.current_price)}
+            <strong>Precio Actual:</strong> ${
+                asset.current_price === null || asset.current_price === undefined
+                    ? `<span class="text-danger">${asset.priceError || 'No se pudo obtener el precio.'}</span>`
+                    : formatCurrency(asset.current_price)
+            }
         </div>
         <div class="mb-3">
             <strong>Valor:</strong> ${formatCurrency(asset.value)}
@@ -534,6 +544,7 @@ window.viewDetails = function(idx) {
         <div class="mb-3">
             <strong>Broker:</strong> ${asset.broker || 'N/A'}
         </div>
+        ${asset.priceError ? `<div class="alert alert-danger mt-2">${asset.priceError}</div>` : ''}
     `;
     const modal = new bootstrap.Modal(document.getElementById('viewDetailsModal'));
     document.getElementById('viewDetailsContent').innerHTML = detailsHTML;
@@ -739,7 +750,7 @@ window.updateAssetPriceByISIN = async function(isin) {
     showAlert(`Precio actualizado para ${asset.name}: ${formatCurrency(price)}`, 'success');
 };
 
-async function getCurrentPriceByISIN(isin) {
+async function getCurrentPriceByISIN(isin, asset = null) {
     const url = "https://api.openfigi.com/v3/mapping";
     const headers = {
         "Content-Type": "application/json",
@@ -753,44 +764,52 @@ async function getCurrentPriceByISIN(isin) {
             body
         });
         if (!res.ok) {
+            if (asset) asset.priceError = 'Error al consultar OpenFIGI: ' + res.statusText;
             showAlert('Error al consultar OpenFIGI: ' + res.statusText, 'danger');
             return null;
         }
         const data = await res.json();
         if (!data || !data[0] || !data[0].data || data[0].data.length === 0) {
-            showAlert('OpenFIGI no devolvió datos para el ISIN ingresado.', 'warning');
+            if (asset) asset.priceError = 'OpenFIGI no devolvió datos para el ISIN ingresado.';
+            showAlert(asset.priceError, 'warning');
             return null;
         }
         const ticker = data[0].data[0].ticker;
         const exchCode = data[0].data[0].exchCode || "US";
         if (!ticker) {
-            showAlert('OpenFIGI no devolvió un ticker para el ISIN ingresado.', 'warning');
+            if (asset) asset.priceError = 'OpenFIGI no devolvió un ticker para el ISIN ingresado.';
+            showAlert(asset.priceError, 'warning');
             return null;
         }
 
         // 1. Intenta Alpha Vantage
         let price = await getPriceByAlphaVantage(ticker, exchCode);
         if (price !== null && price !== undefined && !isNaN(price)) {
+            if (asset) asset.priceError = null;
             showAlert('Precio obtenido correctamente desde Alpha Vantage.', 'success');
             return price;
         } else {
-            showAlert('Alpha Vantage no devolvió precio para el ticker: ' + ticker, 'warning');
+            if (asset) asset.priceError = 'Alpha Vantage no devolvió precio para el ticker: ' + ticker;
+            showAlert(asset.priceError, 'warning');
         }
 
         // 2. Si falla, intenta Yahoo Finance
         price = await getPriceByYahooFinance(ticker, exchCode);
         if (price !== null && price !== undefined && !isNaN(price)) {
+            if (asset) asset.priceError = null;
             showAlert('Precio obtenido correctamente desde Yahoo Finance.', 'success');
             return price;
         } else {
-            showAlert('Yahoo Finance no devolvió precio para el ticker: ' + ticker, 'warning');
+            if (asset) asset.priceError = 'Yahoo Finance no devolvió precio para el ticker: ' + ticker;
+            showAlert(asset.priceError, 'warning');
         }
 
-        // 3. Aquí puedes agregar más proveedores si tienes API key
-        showAlert('No se pudo obtener el precio actual del activo con el ISIN proporcionado.', 'danger');
+        if (asset) asset.priceError = 'No se pudo obtener el precio actual del activo con el ISIN proporcionado.';
+        showAlert(asset.priceError, 'danger');
         return null;
     } catch (e) {
-        showAlert('Error en la consulta de precio por ISIN: ' + (e.message || e), 'danger');
+        if (asset) asset.priceError = 'Error en la consulta de precio por ISIN: ' + (e.message || e);
+        showAlert(asset.priceError, 'danger');
         return null;
     }
 }
