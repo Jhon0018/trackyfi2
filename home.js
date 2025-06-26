@@ -358,7 +358,7 @@ function renderPortfolio() {
                     <button class="btn btn-danger btn-sm me-1" onclick="window.deleteAsset(${idx})">
                         <i class="fas fa-trash"></i>
                     </button>
-                    <button class="btn btn-primary btn-sm" onclick="window.handleUpdatePriceByISIN('${asset.isin}')">
+                    <button class="btn btn-primary btn-sm" onclick="window.updateAssetPriceByISIN('${asset.isin}')">
                         <i class="fas fa-sync-alt"></i> Actualizar
                     </button>
                 </td>
@@ -679,10 +679,11 @@ window.updateAssetPrice = async function(idx) {
             asset.current_price = null;
             asset.value = null;
             asset.profit = null;
+            asset.priceError = 'No se encontró la criptomoneda o el id es incorrecto.';
             savePortfolio();
             updateStats();
             renderPortfolio();
-            showAlert(`La criptomoneda "${asset.name}" no existe o el id es incorrecto.`, 'danger');
+            showAlert(asset.priceError, 'danger');
             return;
         }
     } else {
@@ -691,10 +692,11 @@ window.updateAssetPrice = async function(idx) {
             asset.current_price = null;
             asset.value = null;
             asset.profit = null;
+            asset.priceError = 'No se encontró el activo con ese ISIN.';
             savePortfolio();
             updateStats();
             renderPortfolio();
-            showAlert(`El activo "${asset.ticker}" no existe o el ticker es incorrecto.`, 'danger');
+            showAlert(asset.priceError, 'danger');
             return;
         }
     }
@@ -702,6 +704,7 @@ window.updateAssetPrice = async function(idx) {
     asset.current_price = price;
     asset.value = asset.quantity * asset.current_price;
     asset.profit = asset.value - (asset.quantity * asset.purchase_price) - (asset.commission || 0);
+    asset.priceError = null;
     savePortfolio();
     updateStats();
     renderPortfolio();
@@ -722,28 +725,31 @@ window.updateAssetPriceByISIN = async function(isin) {
             asset.current_price = null;
             asset.value = null;
             asset.profit = null;
+            asset.priceError = 'No se encontró la criptomoneda o el id es incorrecto.';
             savePortfolio();
             updateStats();
             renderPortfolio();
-            showAlert(`La criptomoneda "${asset.name}" no existe o el id es incorrecto.`, 'danger');
+            showAlert(asset.priceError, 'danger');
             return;
         }
     } else {
-        price = await getCurrentPriceByISIN(asset.isin);
+        price = await getCurrentPriceByISIN(asset.isin, asset); // <-- PASA asset AQUÍ
         if (price === null || price === undefined) {
             asset.current_price = null;
             asset.value = null;
             asset.profit = null;
+            // asset.priceError ya fue puesta por getCurrentPriceByISIN
             savePortfolio();
             updateStats();
             renderPortfolio();
-            showAlert(`El activo con ISIN "${asset.isin}" no existe o el ticker es incorrecto.`, 'danger');
+            showAlert(asset.priceError || 'No se pudo obtener el precio.', 'danger');
             return;
         }
     }
     asset.current_price = price;
     asset.value = asset.quantity * asset.current_price;
     asset.profit = asset.value - (asset.quantity * asset.purchase_price) - (asset.commission || 0);
+    asset.priceError = null;
     savePortfolio();
     updateStats();
     renderPortfolio();
@@ -757,15 +763,17 @@ async function getCurrentPriceByISIN(isin, asset = null) {
         "X-OPENFIGI-APIKEY": "65268840c9ff36.28158167"
     };
     const body = JSON.stringify([{ idType: "ID_ISIN", idValue: isin }]);
+    // Usa proxy para evitar CORS
+    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
     try {
-        const res = await fetch(url, {
+        const res = await fetch(proxyUrl, {
             method: "POST",
             headers,
             body
         });
         if (!res.ok) {
-            if (asset) asset.priceError = 'Error al consultar OpenFIGI: ' + res.statusText;
-            showAlert('Error al consultar OpenFIGI: ' + res.statusText, 'danger');
+            if (asset) asset.priceError = 'Error al consultar OpenFIGI (proxy): ' + res.statusText;
+            showAlert('Error al consultar OpenFIGI (proxy): ' + res.statusText, 'danger');
             return null;
         }
         const data = await res.json();
@@ -832,27 +840,22 @@ async function getPriceByAlphaVantage(ticker, exchCode = "US") {
 }
 
 // Yahoo Finance (sin API key, solo para precios de referencia, puede estar limitado)
-async function getPriceByYahooFinance(ticker, exchCode = "US") {
-    // Yahoo Finance espera el símbolo con sufijo de exchange, por ejemplo: VWRL.L, VWRL.AS, etc.
-    let symbol = ticker;
-    if (exchCode && exchCode !== "US") {
-        // Algunos sufijos comunes: XLON -> L, XAMS -> AS, XETR -> DE, etc.
-        const map = { XLON: "L", XAMS: "AS", XETR: "DE", XNAS: "", XNYS: "" };
-        const suffix = map[exchCode] !== undefined ? map[exchCode] : exchCode;
-        symbol = `${ticker}.${suffix}`;
-    }
-    const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbol}`;
+async function getPriceByYahooFinance(ticker) {
+    // Ejemplo: ticker = "VWRL.L" o "AAPL"
+    const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${ticker}`;
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
     try {
-        const res = await fetch(url);
-        const data = await res
+        const res = await fetch(proxyUrl);
+        const data = await res.json();
+        const contents = JSON.parse(data.contents);
         if (
-            data &&
-            data.quoteResponse &&
-            data.quoteResponse.result &&
-            data.quoteResponse.result.length > 0 &&
-            data.quoteResponse.result[0].regularMarketPrice
+            contents &&
+            contents.quoteResponse &&
+            contents.quoteResponse.result &&
+            contents.quoteResponse.result.length > 0 &&
+            contents.quoteResponse.result[0].regularMarketPrice
         ) {
-            return data.quoteResponse.result[0].regularMarketPrice;
+            return contents.quoteResponse.result[0].regularMarketPrice;
         }
         return null;
     } catch (e) {
