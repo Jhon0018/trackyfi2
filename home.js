@@ -687,7 +687,7 @@ window.updateAssetPrice = async function(idx) {
             return;
         }
     } else {
-        price = await getCurrentPriceByISIN(asset.isin);
+        price = await getPriceByISIN(asset.isin);
         if (price === null || price === undefined) {
             asset.current_price = null;
             asset.value = null;
@@ -733,7 +733,7 @@ window.updateAssetPriceByISIN = async function(isin) {
             return;
         }
     } else {
-        price = await getCurrentPriceByISIN(asset.isin, asset); // <-- PASA asset AQUÍ
+        price = await getPriceByISIN(asset.isin);// <-- PASA asset AQUÍ
         if (price === null || price === undefined) {
             asset.current_price = null;
             asset.value = null;
@@ -756,109 +756,11 @@ window.updateAssetPriceByISIN = async function(isin) {
     showAlert(`Precio actualizado para ${asset.name}: ${formatCurrency(price)}`, 'success');
 };
 
-async function getCurrentPriceByISIN(isin, asset = null) {
-    const url = "https://api.openfigi.com/v3/mapping";
-    const headers = {
-        "Content-Type": "application/json",
-        "X-OPENFIGI-APIKEY": "65268840c9ff36.28158167"
-    };
-    const body = JSON.stringify([{ idType: "ID_ISIN", idValue: isin }]);
-    // Usa proxy para evitar CORS
-    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-    try {
-        const res = await fetch(proxyUrl, {
-            method: "POST",
-            headers,
-            body
-        });
-        if (!res.ok) {
-            if (asset) asset.priceError = 'Error al consultar OpenFIGI (proxy): ' + res.statusText;
-            showAlert('Error al consultar OpenFIGI (proxy): ' + res.statusText, 'danger');
-            return null;
-        }
-        const data = await res.json();
-        if (!data || !data[0] || !data[0].data || data[0].data.length === 0) {
-            if (asset) asset.priceError = 'OpenFIGI no devolvió datos para el ISIN ingresado.';
-            showAlert(asset.priceError, 'warning');
-            return null;
-        }
-        const ticker = data[0].data[0].ticker;
-        const exchCode = data[0].data[0].exchCode || "US";
-        if (!ticker) {
-            if (asset) asset.priceError = 'OpenFIGI no devolvió un ticker para el ISIN ingresado.';
-            showAlert(asset.priceError, 'warning');
-            return null;
-        }
 
-        // 1. Intenta Alpha Vantage
-        let price = await getPriceByAlphaVantage(ticker, exchCode);
-        if (price !== null && price !== undefined && !isNaN(price)) {
-            if (asset) asset.priceError = null;
-            showAlert('Precio obtenido correctamente desde Alpha Vantage.', 'success');
-            return price;
-        } else {
-            if (asset) asset.priceError = 'Alpha Vantage no devolvió precio para el ticker: ' + ticker;
-            showAlert(asset.priceError, 'warning');
-        }
-
-        // 2. Si falla, intenta Yahoo Finance
-        price = await getPriceByYahooFinance(ticker, exchCode);
-        if (price !== null && price !== undefined && !isNaN(price)) {
-            if (asset) asset.priceError = null;
-            showAlert('Precio obtenido correctamente desde Yahoo Finance.', 'success');
-            return price;
-        } else {
-            if (asset) asset.priceError = 'Yahoo Finance no devolvió precio para el ticker: ' + ticker;
-            showAlert(asset.priceError, 'warning');
-        }
-
-        if (asset) asset.priceError = 'No se pudo obtener el precio actual del activo con el ISIN proporcionado.';
-        showAlert(asset.priceError, 'danger');
-        return null;
-    } catch (e) {
-        if (asset) asset.priceError = 'Error en la consulta de precio por ISIN: ' + (e.message || e);
-        showAlert(asset.priceError, 'danger');
-        return null;
-    }
-}
-
-// Alpha Vantage
-async function getPriceByAlphaVantage(ticker, exchCode = "US") {
-    const apiKey = "ZRDVOJKXEOSCNTM9";
-    const symbol = exchCode && exchCode !== "US" ? `${ticker}.${exchCode}` : ticker;
-    const url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${apiKey}`;
-    try {
-        const res = await fetch(url);
-        const data = await res.json();
-        if (data && data["Global Quote"] && data["Global Quote"]["05. price"]) {
-            return parseFloat(data["Global Quote"]["05. price"]);
-        }
-        return null;
-    } catch (e) {
-        return null;
-    }
-}
-
-// Yahoo Finance (sin API key, solo para precios de referencia, puede estar limitado)
-async function getPriceByYahooFinance(ticker) {
-    // Ejemplo: ticker = "VWRL.L" o "AAPL"
-    const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${ticker}`;
-    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
-    try {
-        const res = await fetch(proxyUrl);
-        const data = await res.json();
-        const contents = JSON.parse(data.contents);
-        if (
-            contents &&
-            contents.quoteResponse &&
-            contents.quoteResponse.result &&
-            contents.quoteResponse.result.length > 0 &&
-            contents.quoteResponse.result[0].regularMarketPrice
-        ) {
-            return contents.quoteResponse.result[0].regularMarketPrice;
-        }
-        return null;
-    } catch (e) {
-        return null;
-    }
+async function getPriceByISIN(isin) {
+    const url = `http://localhost:5000/api/precio_isin/${isin}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("No se pudo obtener el precio para ese ISIN");
+    const data = await res.json();
+    return data.price;
 }
