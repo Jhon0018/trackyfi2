@@ -101,11 +101,14 @@
                 <div class="setting-row">
                     <span class="setting-label" data-i18n="alertas_precios">Alertas de precios</span>
                     <div class="switch-container">
-                        <input type="checkbox" id="priceAlerts" class="checkbox" checked hidden>
+                        <input type="checkbox" id="priceAlerts" class="checkbox" hidden>
                         <span class="switch">
                             <span class="slider"></span>
                         </span>
                     </div>
+                    <button class="btn btn-outline-info btn-sm ms-3" id="testPriceAlert" type="button">
+                        <i class="fas fa-bell"></i> Probar alerta
+                    </button>
                 </div>
                 <div class="setting-row">
                     <span class="setting-label" data-i18n="novedades">Novedades y sugerencias</span>
@@ -115,15 +118,21 @@
                             <span class="slider"></span>
                         </span>
                     </div>
+                    <button class="btn btn-outline-info btn-sm ms-3" id="testNewsAlert" type="button">
+                        <i class="fas fa-envelope-open-text"></i> Probar novedad
+                    </button>
                 </div>
                 <div class="setting-row">
                     <span class="setting-label" data-i18n="notificaciones_email">Notificaciones por email</span>
                     <div class="switch-container">
-                        <input type="checkbox" id="emailAlerts" class="checkbox" checked hidden>
+                        <input type="checkbox" id="emailAlerts" class="checkbox" hidden>
                         <span class="switch">
                             <span class="slider"></span>
                         </span>
                     </div>
+                    <button class="btn btn-outline-info btn-sm ms-3" id="testEmailAlert" type="button">
+                        <i class="fas fa-paper-plane"></i> Probar email
+                    </button>
                 </div>
             </div>
         </div>
@@ -138,7 +147,6 @@
         <!-- Suscripción -->
         <div class="premium-card mb-4 text-center">
             <i class="fas fa-crown fa-2x mb-2"></i>
-            <div class="premium-title"><strong>TrackYfi Premium</strong></div>
             <div data-i18n="premium_desc">Accede a análisis avanzados, alertas ilimitadas y soporte prioritario.</div>
             <button type="button" class="btn btn-light btn-sm mt-3" id="subscribeBtn" data-i18n="suscribirse"><i class="fas fa-star"></i> Suscribirse</button>
         </div>
@@ -164,5 +172,11 @@
 
     <script type="module" src="configuracion.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+    <script>
+      (function(){
+        emailjs.init('TU_USER_ID_DE_EMAILJS'); // Reemplaza con tu User ID de EmailJS
+      })();
+    </script>
 </body>
 </html>

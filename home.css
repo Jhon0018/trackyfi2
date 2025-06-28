@@ -353,7 +353,7 @@ body.dark-mode .profit-negative {
 
 /* Mejor contraste para botones dentro de la tabla en modo oscuro */
 body.dark-mode .table .btn,
-body.dark-mode .table .btn-sm {
+body.dark_mode .table .btn-sm {
     background: #18181b !important;
     color: #fff !important;
     border-color: #444 !important;
@@ -734,4 +734,93 @@ body.dark-mode #capitalLineChart + * {
     width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box;
+}
+
+/* --------- PORTFOLIO CONTENT --------- */
+#portfolioContent {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+#portfolioContent .table-responsive {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0;
+    border-radius: 0.7rem;
+    background: transparent;
+    overflow-x: auto;
+    box-sizing: border-box;
+}
+
+#portfolioContent .table {
+    width: 100% !important;
+    min-width: 600px;
+    max-width: 100%;
+    margin: 0 auto;
+    border-radius: 0.7rem;
+    background: #fff;
+    color: #18181b;
+    box-shadow: 0 1px 6px 0 rgba(0,0,0,0.04);
+    font-size: 0.93rem;
+    table-layout: auto;
+    transition: background 0.4s, color 0.3s;
+}
+
+#portfolioContent .table th,
+#portfolioContent .table td {
+    text-align: center;
+    vertical-align: middle;
+    padding: 0.45rem 0.5rem;
+    border-color: #e5e7eb !important;
+    font-size: 0.93rem;
+    font-weight: 500;
+}
+
+#portfolioContent .table th {
+    background: #f8fafc !important;
+    color: #18181b !important;
+    font-weight: 700;
+    border-bottom: 2px solid #e5e7eb !important;
+}
+
+#portfolioContent .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: #f8fafc;
+}
+#portfolioContent .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: #fff;
+}
+#portfolioContent .table-striped > tbody > tr:hover {
+    background-color: #222 !important;
+    color: #fff !important;
+    transition: background 0.2s, color 0.2s;
+}
+
+/* Responsive: tabla ocupa todo el ancho en móviles */
+@media (max-width: 800px) {
+    #portfolioContent .table-responsive,
+    #portfolioContent .table {
+        max-width: 100vw;
+        min-width: 320px;
+        font-size: 0.89rem;
+    }
+}
+
+/* --------- GRAFICA DE GANANCIAS Y PERDIDAS --------- */
+#profitLossChart {
+    width: 100% !important;
+    max-width: 100%;
+    min-height: 340px;
+    margin: 0 auto;
+    display: block;
+    background: transparent;
+    border-radius: 1rem;
+    box-shadow: 0 2px 12px 0 rgba(0,0,0,0.04);
+    padding: 0.5rem;
 }

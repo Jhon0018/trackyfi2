@@ -422,3 +422,36 @@ body.dark-mode #sideMenu.offcanvas .btn {
     width: 100%;
     height: auto;
 }
+
+/* Estilo para el botón de Google Auth en el login */
+#googleAuthBtn.btn.btn-outline-dark.w-100.mb-3.d-flex.align-items-center.justify-content-center {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.7rem;
+    padding: 0.7rem 1.2rem;
+    font-size: 1.08rem;
+    font-weight: 500;
+    border-radius: 0.7rem;
+    border: 1.5px solid #000;
+    background: #fff;
+    color: #000;
+    transition: background 0.2s, color 0.2s, border 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px #0001;
+}
+
+#googleAuthBtn:hover,
+#googleAuthBtn:focus {
+    background: #000;
+    color: #fff;
+    border-color: #000;
+    box-shadow: 0 4px 16px #0002;
+}
+
+#googleAuthBtn .google-auth-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 0.5rem;
+    display: inline-block;
+    vertical-align: middle;
+}

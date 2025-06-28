@@ -984,3 +984,4 @@ async function getIndiceReferenciaYahoo(startDate, endDate) {
     }
     return data;
 }
+

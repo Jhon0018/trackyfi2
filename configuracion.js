@@ -18,12 +18,19 @@ const db = getFirestore(app);
 
 let currentUser = null;
 
+// Inicializa EmailJS (asegúrate de tener el script de EmailJS en tu HTML)
+if (window.emailjs) {
+    emailjs.init('TU_USER_ID_DE_EMAILJS'); // Reemplaza con tu User ID de EmailJS
+}
+
 // Cargar datos del usuario al iniciar sesión
 onAuthStateChanged(auth, async user => {
     if (user) {
         currentUser = user;
         // Lee los datos de Firestore
         const docSnap = await getDoc(doc(db, "usuarios", user.uid));
+        let emailToSend = user.email;
+        let nombreToSend = user.displayName || '';
         if (docSnap.exists()) {
             const data = docSnap.data();
             document.getElementById('userName').textContent = data.nombre || user.displayName || '';
@@ -36,10 +43,28 @@ onAuthStateChanged(auth, async user => {
             const idioma = data.idioma || 'es';
             localStorage.setItem('idiomaPreferido', idioma);
             traducirPagina(idioma);
+            emailToSend = data.email || user.email;
+            nombreToSend = data.nombre || user.displayName || '';
         } else {
             document.getElementById('userName').textContent = user.displayName || '';
             document.getElementById('userEmail').textContent = user.email || '';
             traducirPagina('es');
+        }
+
+        // Guardar el correo y nombre en localStorage para uso inmediato
+        localStorage.setItem('trackyfi_userEmail', emailToSend);
+        localStorage.setItem('trackyfi_userName', nombreToSend);
+
+        // Enviar correo automáticamente al iniciar sesión si ya está logeado
+        if (window.emailjs) {
+            emailjs.send('TU_SERVICE_ID', 'TU_TEMPLATE_ID', {
+                to_email: emailToSend,
+                user_name: nombreToSend
+            }).then(function() {
+                showConfigAlert('¡Te hemos enviado un correo de bienvenida!', 'info');
+            }, function(error) {
+                showConfigAlert('Error al enviar el correo: ' + error.text, 'danger');
+            });
         }
     }
 });
@@ -149,42 +174,69 @@ window.addEventListener('DOMContentLoaded', () => {
     traducirPagina(idioma);
 });
 
-// Cambiar notificaciones (solo switches tipo switch, sin botones)
-['priceAlerts', 'newsAlerts', 'emailAlerts'].forEach(id => {
-    const el = document.getElementById(id);
+// Notificaciones: switches y botones funcionales en tiempo real
+const notificationSwitches = [
+    { id: 'priceAlerts', key: 'trackyfi_priceAlerts', label: 'Alertas de precios' },
+    { id: 'newsAlerts', key: 'trackyfi_newsAlerts', label: 'Novedades y sugerencias' },
+    { id: 'emailAlerts', key: 'trackyfi_emailAlerts', label: 'Notificaciones por email' }
+];
+
+notificationSwitches.forEach(cfg => {
+    const el = document.getElementById(cfg.id);
     if (el) {
-        el.addEventListener('change', function() {
-            showConfigAlert(
-                `${el.parentElement.parentElement.querySelector('.setting-label').textContent.trim()} ${el.checked ? 'activado' : 'desactivado'}`,
-                'success'
-            );
-            localStorage.setItem('trackyfi_' + id, el.checked);
-        });
         // Restaurar estado desde localStorage
-        const saved = localStorage.getItem('trackyfi_' + id);
+        const saved = localStorage.getItem(cfg.key);
         if (saved !== null) {
             el.checked = saved === 'true';
         }
+        // Guardar cambios en localStorage y mostrar feedback
+        el.addEventListener('change', function() {
+            localStorage.setItem(cfg.key, el.checked);
+            showConfigAlert(
+                `${cfg.label}: ${el.checked ? 'activado' : 'desactivado'}`,
+                'success'
+            );
+        });
     }
 });
 
-// Enviar sugerencia
-document.querySelector('.suggestion-block button[data-i18n="enviar"]').onclick = async function() {
-    if (!currentUser) return showConfigAlert('Debes iniciar sesión para enviar sugerencias.', 'danger');
-    const sugerencia = document.getElementById('suggestions').value.trim();
-    if (!sugerencia) {
-        showConfigAlert('Por favor, escribe tu sugerencia antes de enviar.', 'warning');
-        return;
-    }
-    // Guarda la sugerencia en Firestore
-    await setDoc(doc(db, "usuarios", currentUser.uid), { sugerencia }, { merge: true });
-    showConfigAlert('¡Gracias por tu sugerencia!', 'success');
+// Botones funcionales de prueba en tiempo real
+const btnTestPrice = document.getElementById('testPriceAlert');
+if (btnTestPrice) btnTestPrice.onclick = function() {
+    showConfigAlert('¡Alerta de precios de ejemplo!', 'info');
+};
+const btnTestNews = document.getElementById('testNewsAlert');
+if (btnTestNews) btnTestNews.onclick = function() {
+    showConfigAlert('¡Novedad o sugerencia de ejemplo!', 'info');
+};
+const btnTestEmail = document.getElementById('testEmailAlert');
+if (btnTestEmail) btnTestEmail.onclick = function() {
+    showConfigAlert('¡Notificación por email de ejemplo!', 'info');
 };
 
+// Enviar sugerencia
+const btnEnviarSugerencia = document.querySelector('.suggestion-block button[data-i18n="enviar"]');
+if (btnEnviarSugerencia) {
+    btnEnviarSugerencia.onclick = async function() {
+        if (!currentUser) return showConfigAlert('Debes iniciar sesión para enviar sugerencias.', 'danger');
+        const sugerencia = document.getElementById('suggestions').value.trim();
+        if (!sugerencia) {
+            showConfigAlert('Por favor, escribe tu sugerencia antes de enviar.', 'warning');
+            return;
+        }
+        // Guarda la sugerencia en Firestore
+        await setDoc(doc(db, "usuarios", currentUser.uid), { sugerencia }, { merge: true });
+        showConfigAlert('¡Gracias por tu sugerencia!', 'success');
+    };
+}
+
 // Suscribirse a Premium
-document.getElementById('subscribeBtn').onclick = function() {
-    showConfigAlert('¡Gracias por elegir Premium! Pronto recibirás un correo de confirmación.', 'info');
-};
+const btnSubscribe = document.getElementById('subscribeBtn');
+if (btnSubscribe) {
+    btnSubscribe.onclick = function() {
+        showConfigAlert('¡Gracias por elegir Premium! Pronto recibirás un correo de confirmación.', 'info');
+    };
+}
 
 // Cambiar email desde modal
 window.saveEmail = function() {
@@ -230,7 +282,7 @@ function showConfigAlert(msg, type = 'success') {
     setTimeout(() => { alertDiv.className = 'alert mt-3 d-none'; }, 2500);
 }
 
-// Traducciones
+// Traducciones (corregido y simplificado)
 const traducciones = {
     es: {
         'preferencias': 'Preferencias',
@@ -325,7 +377,6 @@ function traducirPagina(idioma) {
         }
     });
 }
-
 
 // Botón de modo oscuro/claro
 const btnModo = document.getElementById('btnModo');
