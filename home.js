@@ -758,7 +758,7 @@ window.updateAssetPriceByISIN = async function(isin) {
 
 
 async function getPriceByISIN(isin) {
-    const url = `http://localhost:5000/api/precio_isin/${isin}`;
+    const url = `https://f1c2c6ea-fea4-4036-8a48-4d1e9afc1c0b-00-2u276jfqok5ja.kirk.replit.dev/api/precio_isin/${isin}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error("No se pudo obtener el precio para ese ISIN");
     const data = await res.json();

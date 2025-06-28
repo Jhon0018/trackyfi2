@@ -119,8 +119,6 @@ async function loadFinancials() {
     } catch (e) {
         document.getElementById('ratios').innerHTML = `<div class="alert alert-danger fade-in">No se pudo obtener información financiera para este símbolo.<br>${e.message}</div>`;
         document.getElementById('incomeTable').innerHTML = '';
-        document.getElementById('balanceTable').innerHTML = '';
-        document.getElementById('cashflowTable').innerHTML = '';
     }
 }
 window.onload = loadFinancials;
