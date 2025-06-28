@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-import { getFirestore, collection, addDoc, query, where, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 // Configuración Firebase
 const firebaseConfig = {
@@ -18,7 +18,8 @@ const db = getFirestore(app);
 
 let currentUserId = null;
 let portfolioData = JSON.parse(localStorage.getItem('portfolioData') || '[]');
-let profitPieChart, profitBarChart, weightedPerformanceChartInstance = null;
+let profitPieChart = null;
+let profitBarChart = null;
 let capitalLineChartInstance = null;
 
 // Utilidades
@@ -46,11 +47,11 @@ function showAlert(message, type = 'info') {
 
 // Estadísticas
 function updateStats() {
-    const totalValue = portfolioData.reduce((sum, item) => 
+    const totalValue = portfolioData.reduce((sum, item) =>
         (item.value !== null && !isNaN(item.value)) ? sum + item.value : sum, 0);
-    const totalInvestment = portfolioData.reduce((sum, item) => 
+    const totalInvestment = portfolioData.reduce((sum, item) =>
         (item.quantity && item.purchase_price) ? sum + (item.quantity * item.purchase_price) : sum, 0);
-    const totalProfit = portfolioData.reduce((sum, item) => 
+    const totalProfit = portfolioData.reduce((sum, item) =>
         (item.profit !== null && !isNaN(item.profit)) ? sum + item.profit : sum, 0);
 
     document.getElementById('totalValue').textContent = formatCurrency(totalValue);
@@ -114,7 +115,7 @@ function renderCharts() {
                 y: {
                     beginAtZero: true,
                     ticks: {
-                        callback: function(value) {
+                        callback: function (value) {
                             return value.toLocaleString('es-CO', { style: 'currency', currency: 'USD' });
                         }
                     }
@@ -124,81 +125,14 @@ function renderCharts() {
     });
 }
 
-function renderWeightedPerformanceChart(type = 'performance') {
-    const ctx = document.getElementById('weightedPerformanceChart').getContext('2d');
-    const labels = portfolioData.map(asset => asset.name || asset.ticker || 'Activo');
-    let data = [];
-    let chartLabel = '';
-    let borderColor = '';
-    let backgroundColor = '';
-
-    if (type === 'performance') {
-        // Rendimiento ponderado en %
-        data = portfolioData.map(asset => {
-            const inversion = (asset.quantity * asset.purchase_price) + (asset.commission || 0);
-            if (!inversion || inversion === 0) return 0;
-            return ((asset.profit || 0) / inversion) * 100;
-        });
-        chartLabel = 'Rendimiento Ponderado (%)';
-        borderColor = '#2563eb'; // azul
-        backgroundColor = 'rgba(37,99,235,0.1)';
-        document.getElementById('performanceChartTitle').textContent = 'Rendimiento Ponderado (%)';
-    } else {
-        // Valor total de la inversión
-        data = portfolioData.map(asset => asset.value ?? 0);
-        chartLabel = 'Valor Total';
-        borderColor = '#10b981'; // verde
-        backgroundColor = 'rgba(16,185,129,0.1)';
-        document.getElementById('performanceChartTitle').textContent = 'Valor Total';
-    }
-
-    // Destruir el gráfico anterior si existe
-    if (weightedPerformanceChartInstance) {
-        weightedPerformanceChartInstance.destroy();
-    }
-
-    weightedPerformanceChartInstance = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: chartLabel,
-                data: data,
-                borderColor: borderColor,
-                backgroundColor: backgroundColor,
-                borderWidth: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { display: true },
-                tooltip: { enabled: true }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        color: document.body.classList.contains('dark-mode') ? '#fff' : '#18181b',
-                        callback: function(value) {
-                            return type === 'performance' ? value + '%' : value;
-                        }
-                    }
-                },
-                x: {
-                    ticks: {
-                        color: document.body.classList.contains('dark-mode') ? '#fff' : '#18181b'
-                    }
-                }
-            }
-        }
-    });
-}
-
-function renderCapitalLineChart() {
+async function renderCapitalLineChart() {
     if (!window.Chart) return;
 
-    const ctx = document.getElementById('capitalLineChart').getContext('2d');
+    const chartCanvas = document.getElementById('capitalLineChart');
+    chartCanvas.setAttribute('role', 'img');
+    chartCanvas.setAttribute('aria-label', 'Gráfica de evolución del capital total ponderado, inversión y ganancia/pérdida acumulada');
+
+    const ctx = chartCanvas.getContext('2d');
     if (capitalLineChartInstance) capitalLineChartInstance.destroy();
 
     if (!portfolioData.length) {
@@ -207,21 +141,82 @@ function renderCapitalLineChart() {
             data: {
                 labels: ['Sin datos'],
                 datasets: [{
-                    label: 'Evolución Capital Total',
+                    label: 'Capital Total Ponderado',
                     data: [0],
                     fill: true,
                     borderColor: '#2563eb',
                     backgroundColor: 'rgba(37,99,235,0.1)',
+                    borderWidth: 4,
+                    pointRadius: 6,
+                    pointBackgroundColor: '#2563eb',
                     tension: 0.4,
-                    pointRadius: 2,
-                    pointBackgroundColor: '#2563eb'
+                    cubicInterpolationMode: 'monotone'
                 }]
+            },
+            options: {
+                plugins: {
+                    legend: { display: true, labels: { font: { size: 16 }, color: '#222' } },
+                    title: { display: true, text: 'Evolución del Capital Total Ponderado', font: { size: 22 }, color: '#222' },
+                    tooltip: {
+                        enabled: true,
+                        backgroundColor: '#fff',
+                        borderColor: '#2563eb',
+                        borderWidth: 2,
+                        titleColor: '#18181b',
+                        bodyColor: '#18181b',
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.dataset.label}: ${context.parsed.y.toLocaleString('es-CO', { style: 'currency', currency: 'USD' })}`;
+                            }
+                        }
+                    }
+                },
+                layout: {
+                    padding: { left: 16, right: 16, top: 24, bottom: 16 }
+                },
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Fecha o Activo', font: { size: 16 }, color: '#222' },
+                        ticks: { font: { size: 14 }, color: '#222' },
+                        grid: { color: 'rgba(0,0,0,0.05)' }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'USD', font: { size: 16 }, color: '#222' },
+                        ticks: {
+                            font: { size: 14 },
+                            color: '#222',
+                            callback: function (value) {
+                                return value.toLocaleString('es-CO', { style: 'currency', currency: 'USD' });
+                            }
+                        },
+                        grid: { color: 'rgba(0,0,0,0.07)' }
+                    }
+                },
+                elements: {
+                    line: {
+                        borderWidth: 4,
+                        borderJoinStyle: 'round',
+                        shadowOffsetX: 0,
+                        shadowOffsetY: 2,
+                        shadowBlur: 8,
+                        shadowColor: 'rgba(37,99,235,0.15)'
+                    },
+                    point: {
+                        radius: 7,
+                        backgroundColor: '#fff',
+                        borderWidth: 3,
+                        borderColor: '#2563eb',
+                        hoverRadius: 10,
+                        hoverBorderWidth: 4
+                    }
+                }
             }
         });
         return;
     }
 
-    // Si hay fechas, ordena por fecha; si no, usa el orden de ingreso
+    // Ordenar por fecha de compra si existe, si no por orden de ingreso
     let sorted = [];
     if (portfolioData.some(a => a.purchase_date)) {
         sorted = [...portfolioData]
@@ -232,55 +227,267 @@ function renderCapitalLineChart() {
     }
 
     let labels = [];
-    let data = [];
-    let acumulado = 0;
+    let capitalAcumulado = [];
+    let inversionAcumulada = [];
+    let gananciaAcumulada = [];
+    let rendimientoAcumulado = [];
+    let sumaCapital = 0;
+    let sumaInversion = 0;
+    let sumaGanancia = 0;
 
     sorted.forEach(asset => {
-        const profit = (asset.profit !== null && !isNaN(asset.profit)) ? asset.profit : 0;
-        acumulado += profit;
+        const value = (asset.value !== null && !isNaN(asset.value)) ? asset.value : 0;
+        const inversion = (asset.quantity && asset.purchase_price) ? (asset.quantity * asset.purchase_price) + (asset.commission || 0) : 0;
+        const ganancia = (asset.profit !== null && !isNaN(asset.profit)) ? asset.profit : 0;
+
+        sumaCapital += value;
+        sumaInversion += inversion;
+        sumaGanancia += ganancia;
+
         labels.push(asset.purchase_date || asset.name);
-        data.push(acumulado);
+        capitalAcumulado.push(sumaCapital);
+        inversionAcumulada.push(sumaInversion);
+        gananciaAcumulada.push(sumaGanancia);
+
+        // Calcular rendimiento acumulado (%)
+        let rendimiento = 0;
+        if (sumaInversion > 0) {
+            rendimiento = (sumaGanancia / sumaInversion) * 100;
+        }
+        rendimientoAcumulado.push(rendimiento);
     });
 
-    // Si sigue sin datos, muestra un punto plano
-    if (data.length === 0) {
+    // === COMPARATIVA CON ÍNDICE DE REFERENCIA REAL (S&P 500) ===
+    let indiceReferencia = [];
+    if (labels.length > 1) {
+        // Obtener fechas de tu portafolio
+        let fechas = labels.map(l => l.split(' ')[0]);
+        let startDate = fechas[0];
+        let endDate = fechas[fechas.length - 1];
+
+        try {
+            const indiceData = await getIndiceReferenciaYahoo(startDate, endDate);
+            // Normalizar el índice para que empiece en el mismo valor base que tu portafolio
+            const base = capitalAcumulado[0] || 1000;
+            const firstClose = indiceData[0]?.close || 1;
+            for (let i = 0; i < labels.length; i++) {
+                // Buscar el dato del índice para la fecha más cercana
+                const fecha = fechas[i];
+                const idx = indiceData.findIndex(d => d.date >= fecha);
+                if (idx !== -1) {
+                    indiceReferencia.push(base * (indiceData[idx].close / firstClose));
+                } else {
+                    indiceReferencia.push(null);
+                }
+            }
+        } catch (e) {
+            indiceReferencia = Array(labels.length).fill(null);
+        }
+    } else {
+        indiceReferencia = Array(labels.length).fill(null);
+    }
+
+    // === AGREGADO: Cálculo de rendimiento anualizado, volatilidad y drawdown ===
+    function getRendimientoAnualizado() {
+        if (capitalAcumulado.length < 2) return 0;
+        const inicial = inversionAcumulada[0] || 1;
+        const final = capitalAcumulado[capitalAcumulado.length - 1];
+        const years = (labels.length - 1) / 12 || 1; // asumiendo mensualidad
+        return ((final / inicial) ** (1 / years) - 1) * 100;
+    }
+    function getVolatilidad() {
+        if (capitalAcumulado.length < 2) return 0;
+        let returns = [];
+        for (let i = 1; i < capitalAcumulado.length; i++) {
+            if (capitalAcumulado[i - 1] > 0) {
+                returns.push((capitalAcumulado[i] - capitalAcumulado[i - 1]) / capitalAcumulado[i - 1]);
+            }
+        }
+        const mean = returns.reduce((a, b) => a + b, 0) / returns.length;
+        const variance = returns.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / returns.length;
+        return Math.sqrt(variance) * Math.sqrt(12) * 100; // anualizada
+    }
+    function getMaxDrawdown() {
+        let max = -Infinity, maxDrawdown = 0;
+        for (let v of capitalAcumulado) {
+            if (v > max) max = v;
+            let drawdown = (max - v) / max;
+            if (drawdown > maxDrawdown) maxDrawdown = drawdown;
+        }
+        return maxDrawdown * 100;
+    }
+
+    const rendimientoAnualizado = getRendimientoAnualizado();
+    const volatilidad = getVolatilidad();
+    const maxDrawdown = getMaxDrawdown();
+
+    if (labels.length === 0) {
         labels = ['Sin datos'];
-        data = [0];
+        capitalAcumulado = [0];
+        inversionAcumulada = [0];
+        gananciaAcumulada = [0];
+        rendimientoAcumulado = [0];
+        indiceReferencia = [0];
     }
 
     capitalLineChartInstance = new Chart(ctx, {
         type: 'line',
         data: {
             labels: labels,
-            datasets: [{
-                label: 'Evolución Ganancia/Pérdida Acumulada',
-                data: data,
-                fill: true,
-                borderColor: '#2563eb',
-                backgroundColor: 'rgba(37,99,235,0.1)',
-                tension: 0.4,
-                pointRadius: 2,
-                pointBackgroundColor: '#2563eb'
-            }]
+            datasets: [
+                {
+                    label: 'Capital Actual Acumulado',
+                    data: capitalAcumulado,
+                    fill: true,
+                    borderColor: '#2563eb',
+                    backgroundColor: 'rgba(37,99,235,0.12)',
+                    borderWidth: 4,
+                    pointRadius: 7,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#2563eb',
+                    pointBorderWidth: 3,
+                    tension: 0.4,
+                    cubicInterpolationMode: 'monotone'
+                },
+                {
+                    label: 'Inversión Acumulada',
+                    data: inversionAcumulada,
+                    fill: false,
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16,185,129,0.08)',
+                    borderDash: [8, 6],
+                    borderWidth: 4,
+                    pointRadius: 7,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#10b981',
+                    pointBorderWidth: 3,
+                    tension: 0.4,
+                    cubicInterpolationMode: 'monotone'
+                },
+                {
+                    label: 'Ganancia/Pérdida Acumulada',
+                    data: gananciaAcumulada,
+                    fill: false,
+                    borderColor: '#f59e42',
+                    backgroundColor: 'rgba(245,158,66,0.08)',
+                    borderDash: [4, 4],
+                    borderWidth: 4,
+                    pointRadius: 7,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#f59e42',
+                    pointBorderWidth: 3,
+                    tension: 0.4,
+                    cubicInterpolationMode: 'monotone'
+                },
+                {
+                    label: 'Rendimiento (%)',
+                    data: rendimientoAcumulado,
+                    fill: false,
+                    borderColor: '#8b5cf6',
+                    backgroundColor: 'rgba(139,92,246,0.08)',
+                    borderDash: [2, 2],
+                    borderWidth: 3,
+                    pointRadius: 6,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#8b5cf6',
+                    pointBorderWidth: 2,
+                    tension: 0.4,
+                    cubicInterpolationMode: 'monotone',
+                    yAxisID: 'y1'
+                },
+                {
+                    label: 'S&P 500 (Índice de referencia)',
+                    data: indiceReferencia,
+                    fill: false,
+                    borderColor: '#111',
+                    backgroundColor: 'rgba(0,0,0,0.08)',
+                    borderDash: [1, 1],
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    pointBackgroundColor: '#111',
+                    pointBorderColor: '#111',
+                    pointBorderWidth: 1,
+                    tension: 0.4,
+                    cubicInterpolationMode: 'monotone',
+                    yAxisID: 'y'
+                }
+            ]
         },
         options: {
             responsive: true,
             plugins: {
-                legend: { display: false },
-                tooltip: { enabled: true }
+                legend: { display: true, labels: { font: { size: 16 }, color: '#222' } },
+                title: {
+                    display: true,
+                    text: `Evolución del Capital Total Ponderado | Rend. anualizado: ${rendimientoAnualizado.toFixed(2)}% | Volatilidad: ${volatilidad.toFixed(2)}% | Máx. Drawdown: ${maxDrawdown.toFixed(2)}%`,
+                    font: { size: 18 },
+                    color: '#222'
+                },
+                tooltip: {
+                    enabled: true,
+                    backgroundColor: '#fff',
+                    borderColor: '#2563eb',
+                    borderWidth: 2,
+                    titleColor: '#18181b',
+                    bodyColor: '#18181b',
+                    callbacks: {
+                        label: function(context) {
+                            if (context.dataset.label === 'Rendimiento (%)') {
+                                return `${context.dataset.label}: ${context.parsed.y.toFixed(2)}%`;
+                            }
+                            if (context.dataset.label.includes('Índice')) {
+                                return `${context.dataset.label}: ${context.parsed.y ? context.parsed.y.toLocaleString('es-CO', { style: 'currency', currency: 'USD' }) : 'Sin dato'}`;
+                            }
+                            return `${context.dataset.label}: ${context.parsed.y.toLocaleString('es-CO', { style: 'currency', currency: 'USD' })}`;
+                        }
+                    }
+                }
+            },
+            layout: {
+                padding: { left: 16, right: 16, top: 24, bottom: 16 }
             },
             scales: {
                 x: {
-                    title: { display: true, text: 'Fecha o Activo' }
+                    title: { display: true, text: 'Fecha o Activo', font: { size: 16 }, color: '#222' },
+                    ticks: { font: { size: 14 }, color: '#222' },
+                    grid: { color: 'rgba(0,0,0,0.05)' }
                 },
                 y: {
                     beginAtZero: true,
-                    title: { display: true, text: 'Ganancia/Pérdida Acumulada' },
+                    title: { display: true, text: 'USD', font: { size: 16 }, color: '#222' },
                     ticks: {
-                        callback: function(value) {
+                        font: { size: 14 },
+                        color: '#222',
+                        callback: function (value) {
                             return value.toLocaleString('es-CO', { style: 'currency', currency: 'USD' });
                         }
-                    }
+                    },
+                    grid: { color: 'rgba(0,0,0,0.07)' }
+                },
+                y1: {
+                    position: 'right',
+                    title: { display: true, text: 'Rendimiento (%)', font: { size: 16 }, color: '#8b5cf6' },
+                    ticks: {
+                        font: { size: 14 },
+                        color: '#8b5cf6',
+                        callback: function (value) {
+                            return value.toFixed(2) + '%';
+                        }
+                    },
+                    grid: { drawOnChartArea: false }
+                }
+            },
+            elements: {
+                line: {
+                    borderWidth: 4,
+                    borderJoinStyle: 'round'
+                },
+                point: {
+                    radius: 7,
+                    backgroundColor: '#fff',
+                    borderWidth: 3,
+                    hoverRadius: 10,
+                    hoverBorderWidth: 4
                 }
             }
         }
@@ -372,7 +579,6 @@ function renderPortfolio() {
     `;
     container.innerHTML = tableHTML;
     renderCharts();
-    renderWeightedPerformanceChart('performance');
     renderCapitalLineChart();
 }
 
@@ -459,7 +665,7 @@ async function addCrypto(formData) {
     }
 }
 
-window.editAsset = function(idx) {
+window.editAsset = function (idx) {
     const asset = portfolioData[idx];
     if (!asset) return;
     document.getElementById('editAssetId').value = idx;
@@ -470,7 +676,7 @@ window.editAsset = function(idx) {
     modal.show();
 };
 
-window.saveEdit = function() {
+window.saveEdit = function () {
     const idx = parseInt(document.getElementById('editAssetId').value);
     const asset = portfolioData[idx];
     if (!asset) return;
@@ -487,7 +693,7 @@ window.saveEdit = function() {
     showAlert('Activo actualizado exitosamente', 'success');
 };
 
-window.deleteAsset = function(idx) {
+window.deleteAsset = function (idx) {
     if (confirm('¿Estás seguro de que deseas eliminar este activo?')) {
         portfolioData.splice(idx, 1);
         savePortfolio();
@@ -497,7 +703,7 @@ window.deleteAsset = function(idx) {
     }
 };
 
-window.viewDetails = function(idx) {
+window.viewDetails = function (idx) {
     const asset = portfolioData[idx];
     if (!asset) return;
     let detailsHTML = `
@@ -518,10 +724,10 @@ window.viewDetails = function(idx) {
         </div>
         <div class="mb-3">
             <strong>Precio Actual:</strong> ${
-                asset.current_price === null || asset.current_price === undefined
-                    ? `<span class="text-danger">${asset.priceError || 'No se pudo obtener el precio.'}</span>`
-                    : formatCurrency(asset.current_price)
-            }
+        asset.current_price === null || asset.current_price === undefined
+            ? `<span class="text-danger">${asset.priceError || 'No se pudo obtener el precio.'}</span>`
+            : formatCurrency(asset.current_price)
+    }
         </div>
         <div class="mb-3">
             <strong>Valor:</strong> ${formatCurrency(asset.value)}
@@ -552,14 +758,14 @@ window.viewDetails = function(idx) {
 };
 
 // Event Listeners
-document.getElementById('addAssetForm').addEventListener('submit', function(e) {
+document.getElementById('addAssetForm').addEventListener('submit', function (e) {
     e.preventDefault();
     const formData = new FormData(this);
     const data = Object.fromEntries(formData);
     addAsset(data);
     this.reset();
 });
-document.getElementById('addCryptoForm').addEventListener('submit', function(e) {
+document.getElementById('addCryptoForm').addEventListener('submit', function (e) {
     e.preventDefault();
     const formData = new FormData(this);
     const data = Object.fromEntries(formData);
@@ -567,32 +773,30 @@ document.getElementById('addCryptoForm').addEventListener('submit', function(e) 
     this.reset();
 });
 document.getElementById('saveEditBtn').addEventListener('click', window.saveEdit);
-document.getElementById('refreshBtn').addEventListener('click', function() {
+document.getElementById('refreshBtn').addEventListener('click', function () {
     showAlert('No hay conexión a precios en tiempo real en modo local.', 'info');
 });
-document.getElementById('toggleDetailsAsset').addEventListener('click', function() {
+document.getElementById('toggleDetailsAsset').addEventListener('click', function () {
     const details = document.getElementById('assetDetails');
     details.style.display = details.style.display === 'none' ? 'block' : 'none';
 });
-document.getElementById('toggleDetailsCrypto').addEventListener('click', function() {
+document.getElementById('toggleDetailsCrypto').addEventListener('click', function () {
     const details = document.getElementById('cryptoDetails');
     details.style.display = details.style.display === 'none' ? 'block' : 'none';
 });
-document.getElementById('toggleAssetForm').addEventListener('click', function() {
+document.getElementById('toggleAssetForm').addEventListener('click', function () {
     const form = document.getElementById('assetFormContainer');
     form.style.display = form.style.display === 'none' ? 'block' : 'none';
 });
-document.getElementById('toggleCryptoForm').addEventListener('click', function() {
+document.getElementById('toggleCryptoForm').addEventListener('click', function () {
     const form = document.getElementById('cryptoFormContainer');
     form.style.display = form.style.display === 'none' ? 'block' : 'none';
 });
 
 // Modo oscuro
-// Botón de modo oscuro funcional en el sidebar
 const toggleThemeBtn = document.getElementById('toggleThemeBtn');
 const themeIcon = toggleThemeBtn.querySelector('i');
 
-// Cargar preferencia guardada
 if (localStorage.getItem('theme') === 'dark') {
     document.body.classList.add('dark-mode');
     if (themeIcon) themeIcon.classList.replace('fa-moon', 'fa-sun');
@@ -604,7 +808,6 @@ toggleThemeBtn.addEventListener('click', function (e) {
     document.body.classList.toggle('dark-mode');
     const isDark = document.body.classList.contains('dark-mode');
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    // Cambia el icono y texto
     if (themeIcon) {
         if (isDark) {
             themeIcon.classList.replace('fa-moon', 'fa-sun');
@@ -646,8 +849,6 @@ onAuthStateChanged(auth, (user) => {
         loadPortfolioFromFirestore();
     } else {
         currentUserId = null;
-        // portfolioData = [];
-        // renderPortfolio();
     }
 });
 
@@ -668,7 +869,7 @@ async function getCurrentPriceCrypto(cryptoId, currency = 'usd') {
 }
 
 // Actualiza el precio y recalcula ganancia/pérdida
-window.updateAssetPrice = async function(idx) {
+window.updateAssetPrice = async function (idx) {
     const asset = portfolioData[idx];
     if (!asset) return;
 
@@ -711,7 +912,7 @@ window.updateAssetPrice = async function(idx) {
     showAlert(`Precio actualizado para ${asset.name}: ${formatCurrency(price)}`, 'success');
 };
 
-window.updateAssetPriceByISIN = async function(isin) {
+window.updateAssetPriceByISIN = async function (isin) {
     const asset = portfolioData.find(a => a.isin === isin);
     if (!asset) {
         showAlert('No se encontró el activo con ese ISIN.', 'danger');
@@ -733,12 +934,11 @@ window.updateAssetPriceByISIN = async function(isin) {
             return;
         }
     } else {
-        price = await getPriceByISIN(asset.isin);// <-- PASA asset AQUÍ
+        price = await getPriceByISIN(asset.isin);
         if (price === null || price === undefined) {
             asset.current_price = null;
             asset.value = null;
             asset.profit = null;
-            // asset.priceError ya fue puesta por getCurrentPriceByISIN
             savePortfolio();
             updateStats();
             renderPortfolio();
@@ -756,11 +956,31 @@ window.updateAssetPriceByISIN = async function(isin) {
     showAlert(`Precio actualizado para ${asset.name}: ${formatCurrency(price)}`, 'success');
 };
 
-
 async function getPriceByISIN(isin) {
     const url = `https://f1c2c6ea-fea4-4036-8a48-4d1e9afc1c0b-00-2u276jfqok5ja.kirk.replit.dev/api/precio_isin/${isin}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error("No se pudo obtener el precio para ese ISIN");
     const data = await res.json();
     return data.price;
+}
+
+async function getIndiceReferenciaYahoo(startDate, endDate) {
+    // Formato de fechas: YYYY-MM-DD
+    const symbol = '^GSPC'; // S&P 500
+    const start = Math.floor(new Date(startDate).getTime() / 1000);
+    const end = Math.floor(new Date(endDate).getTime() / 1000);
+    const url = `https://query1.finance.yahoo.com/v7/finance/download/${symbol}?period1=${start}&period2=${end}&interval=1d&events=history&includeAdjustedClose=true`;
+
+    const response = await fetch(url);
+    const csv = await response.text();
+    // Parsear CSV
+    const lines = csv.split('\n').slice(1); // quitar encabezado
+    const data = [];
+    for (let line of lines) {
+        const [date, open, high, low, close] = line.split(',');
+        if (date && close && !isNaN(close)) {
+            data.push({ date, close: parseFloat(close) });
+        }
+    }
+    return data;
 }

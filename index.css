@@ -8,6 +8,12 @@ body {
 
 .navbar {
     background-color: rgba(255,255,255,0.95);
+    -webkit-backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(0,0,0,0.1);
     transition: background 0.3s, border-bottom 0.3s;
@@ -108,6 +114,7 @@ body {
 
 .stats-section {
     background: rgba(255,255,255,0.6);
+    -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
     padding: 4rem 0;
     margin: 4rem 0;
@@ -159,6 +166,7 @@ body {
 .login-form {
     background: rgba(255,255,255,0.8);
     backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px); /* Soporte para Safari */
     border-radius: 1rem;
     padding: 2rem;
     border: 1px solid #000;

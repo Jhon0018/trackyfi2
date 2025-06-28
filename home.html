@@ -8,12 +8,14 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome para iconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <!-- Estilos personalizados -->
     <link rel="stylesheet" href="home.css">
 </head>
 <body>
     <!-- Barra lateral izquierda -->
-    <div id="sidebar" class="d-flex flex-column flex-shrink-0 p-3 bg-light border-end position-fixed" style="width: 220px; height: 100vh; z-index: 1040;">
+    <div id="sidebar" class="d-flex flex-column flex-shrink-0 p-3 bg-light border-end position-fixed sidebar-custom">
         <a href="index.html" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
             <span class="fs-4"><i class="fas fa-chart-pie me-2"></i>Trackerfolio</span>
         </a>
@@ -55,6 +57,11 @@
                 </a>
             </li>
             <li>
+                <a href="interesCompuestos.html" class="nav-link text-dark">
+                    <i class="fas fa-percent me-2"></i> Interés Compuesto
+                </a>
+            </li>
+            <li>
                 <button 
                     class="btn btn-premium w-100 my-2" 
                     id="sidebarPremiumBtn" 
@@ -67,8 +74,8 @@
         </ul>
     </div>
 
-    <!-- Contenido principal (ajustado con margen derecho) -->
-    <div style="margin-right:220px;">
+    <!-- Contenido principal -->
+    <div class="main-content">
         <div class="dashboard-container">
             <div class="container">
                 <!-- Alertas -->
@@ -99,12 +106,25 @@
                 <!-- Gráfica de Línea: Capital Total -->
                 <div class="row mb-4">
                     <div class="col-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <i class="fas fa-chart-line me-2"></i>Evolución del Capital Total
+                        <div class="card shadow-lg border-0">
+                            <div class="card-header bg-white border-0 d-flex align-items-center card-header-custom">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" class="bi bi-cash-coin text-success me-3" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M11 15a4 4 0 1 0 0-8 4 4 0 0 0 0 8m5-4a5 5 0 1 1-10 0 5 5 0 0 1 10 0"/>
+                                    <path d="M9.438 11.944c.047.596.518 1.06 1.363 1.116v.44h.375v-.443c.875-.061 1.386-.529 1.386-1.207 0-.618-.39-.936-1.09-1.1l-.296-.07v-1.2c.376.043.614.248.671.532h.658c-.047-.575-.54-1.024-1.329-1.073V8.5h-.375v.45c-.747.073-1.255.522-1.255 1.158 0 .562.378.92 1.007 1.066l.248.061v1.272c-.384-.058-.639-.27-.696-.563h-.668zm1.36-1.354c-.369-.085-.569-.26-.569-.522 0-.294.216-.514.572-.578v1.1zm.432.746c.449.104.655.272.655.569 0 .339-.257.571-.709.614v-1.195z"/>
+                                    <path d="M1 0a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h4.083q.088-.517.258-1H3a2 2 0 0 0-2-2V3a2 2 0 0 0 2-2h10a2 2 0 0 0 2 2v3.528c.38.34.717.728 1 1.154V1a1 1 0 0 0-1-1z"/>
+                                    <path d="M9.998 5.083 10 5a2 2 0 1 0-3.132 1.65 6 6 0 0 1 3.13-1.567"/>
+                                </svg>
+                                <span class="fw-semibold">Evolución del Capital Total</span>
+                                <span class="ms-auto badge rounded-pill bg-light text-secondary badge-custom-size">Actualizado</span>
                             </div>
-                            <div class="card-body">
-                                <canvas id="capitalLineChart" height="70"></canvas>
+                            <div class="card-body pb-0-custom">
+                                <div class="row align-items-center">
+                                    <div class="col-12">
+                                        <div class="p-3 rounded bg-light min-height-340 w-100">
+                                            <canvas id="capitalLineChart" height="264" aria-label="Gráfica de evolución del capital total ponderado, inversión y ganancia/pérdida acumulada" role="img"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -114,126 +134,125 @@
                 <div class="row mb-4">
                     <div class="col-md-6">
                         <div class="card">
-                            <div class="card-header d-flex align-items-center" style="cursor:pointer;" id="toggleAssetForm">
+                            <div class="card-header d-flex align-items-center cursor-pointer" id="toggleAssetForm">
                                 <i class="fas fa-plus-circle me-2"></i>
                                 <span>Agregar Activo</span>
                             </div>
-                            <div class="card-body p-0" id="assetFormContainer" style="display:none;">
+                            <div class="card-body p-0" id="assetFormContainer">
                                 <!-- Formulario de agregar activo -->
-    <form id="addAssetForm" class="p-3">
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label for="name" class="form-label">Nombre</label>
-                <input type="text" class="form-control" id="name" name="name" required>
-            </div>
-            <div class="col-md-6 mb-3">
-                <label for="ticker" class="form-label">Ticker</label>
-                <input type="text" class="form-control" id="ticker" name="ticker">
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label for="isin" class="form-label">ISIN</label>
-                <input type="text" class="form-control" id="isin" name="isin">
-            </div>
-            <div class="col-md-6 mb-3">
-                <label for="quantity" class="form-label">Cantidad</label>
-                <input type="number" step="0.01" class="form-control" id="quantity" name="quantity" required>
-            </div>
-        </div>
-        <div class="mb-3">
-            <label for="purchase_price" class="form-label">Precio de Compra</label>
-            <input type="number" step="0.01" class="form-control" id="purchase_price" name="purchase_price" required>
-        </div>
-        <div class="mb-3">
-            <label for="currency" class="form-label">Divisa</label>
-            <select class="form-control" id="currency" name="currency">
-                <option value="USD">USD</option>
-                <option value="EUR">EUR</option>
-                <option value="COP">COP</option>
-                <option value="MXN">MXN</option>
-            </select>
-        </div>
-        <button type="button" class="btn btn-outline-dark mb-2" id="toggleDetailsAsset">+ Más Detalle</button>
-        <div id="assetDetails" style="display:none;">
-            <div class="mb-3">
-                <label for="purchase_date" class="form-label">Fecha de compra</label>
-                <input type="date" class="form-control" id="purchase_date" name="purchase_date">
-            </div>
-            <div class="mb-3">
-                <label for="notes" class="form-label">Notas o Comentarios</label>
-                <textarea class="form-control" id="notes" name="notes"></textarea>
-            </div>
-            <div class="mb-3">
-                <label for="commission" class="form-label">Comisión</label>
-                <input type="number" step="0.01" class="form-control" id="commission" name="commission">
-            </div>
-            <div class="mb-3">
-                <label for="broker" class="form-label">Broker / Plataforma</label>
-                <input type="text" class="form-control" id="broker" name="broker">
-            </div>
-        </div>
-        <button type="submit" class="btn btn-custom w-100">
-            <i class="fas fa-plus me-2"></i>Agregar Activo
-        </button>
-    </form>
+                                <form id="addAssetForm" class="p-3">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="name" class="form-label">Nombre</label>
+                                            <input type="text" class="form-control" id="name" name="name" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="ticker" class="form-label">Ticker</label>
+                                            <input type="text" class="form-control" id="ticker" name="ticker">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="isin" class="form-label">ISIN</label>
+                                            <input type="text" class="form-control" id="isin" name="isin">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="quantity" class="form-label">Cantidad</label>
+                                            <input type="number" step="0.01" class="form-control" id="quantity" name="quantity" required>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="purchase_price" class="form-label">Precio de Compra</label>
+                                        <input type="number" step="0.01" class="form-control" id="purchase_price" name="purchase_price" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="currency" class="form-label">Divisa</label>
+                                        <select class="form-control" id="currency" name="currency">
+                                            <option value="USD">USD</option>
+                                            <option value="EUR">EUR</option>
+                                            <option value="COP">COP</option>
+                                            <option value="MXN">MXN</option>
+                                        </select>
+                                    </div>
+                                    <button type="button" class="btn btn-outline-dark mb-2" id="toggleDetailsAsset">+ Más Detalle</button>
+                                    <div id="assetDetails">
+                                        <div class="mb-3">
+                                            <label for="purchase_date" class="form-label">Fecha de compra</label>
+                                            <input type="date" class="form-control" id="purchase_date" name="purchase_date">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="notes" class="form-label">Notas o Comentarios</label>
+                                            <textarea class="form-control" id="notes" name="notes"></textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="commission" class="form-label">Comisión</label>
+                                            <input type="number" step="0.01" class="form-control" id="commission" name="commission">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="broker" class="form-label">Broker / Plataforma</label>
+                                            <input type="text" class="form-control" id="broker" name="broker">
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-custom w-100">
+                                        <i class="fas fa-plus me-2"></i>Agregar Activo
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="card">
-                            <div class="card-header d-flex align-items-center" style="cursor:pointer;" id="toggleCryptoForm">
+                            <div class="card-header d-flex align-items-center cursor-pointer" id="toggleCryptoForm">
                                 <i class="fab fa-bitcoin me-2"></i>
                                 <span>Agregar Criptomoneda</span>
                             </div>
-                            <div class="card-body p-0" id="cryptoFormContainer" style="display:none;">
+                            <div class="card-body p-0" id="cryptoFormContainer">
                                 <!-- Formulario de agregar cripto -->
-<form id="addCryptoForm" class="p-3">
-    <div class="mb-3">
-        <label for="crypto_name" class="form-label">Criptomoneda</label>
-        <input type="text" class="form-control" id="crypto_name" name="crypto_name" placeholder="bitcoin,BTC" required>
-       
-    </div>
-    <div class="mb-3">
-        <label for="crypto_quantity" class="form-label">Cantidad</label>
-        <input type="number" step="0.00000001" class="form-control" id="crypto_quantity" name="crypto_quantity" required>
-    </div>
-    <div class="mb-3">
-        <label for="crypto_purchase_price" class="form-label">Precio de Compra</label>
-        <input type="number" step="0.01" class="form-control" id="crypto_purchase_price" name="crypto_purchase_price" required>
-    </div>
-    <div class="mb-3">
-        <label for="crypto_currency" class="form-label">Divisa</label>
-        <select class="form-control" id="crypto_currency" name="crypto_currency">
-            <option value="USD">USD</option>
-            <option value="EUR">EUR</option>
-            <option value="COP">COP</option>
-            <option value="MXN">MXN</option>
-        </select>
-    </div>
-    <button type="button" class="btn btn-outline-dark mb-2" id="toggleDetailsCrypto">+ Más Detalle</button>
-    <div id="cryptoDetails" style="display:none;">
-        <div class="mb-3">
-            <label for="crypto_purchase_date" class="form-label">Fecha de compra</label>
-            <input type="date" class="form-control" id="crypto_purchase_date" name="crypto_purchase_date">
-        </div>
-        <div class="mb-3">
-            <label for="crypto_notes" class="form-label">Notas o Comentarios</label>
-            <textarea class="form-control" id="crypto_notes" name="crypto_notes"></textarea>
-        </div>
-        <div class="mb-3">
-            <label for="crypto_commission" class="form-label">Comisión</label>
-            <input type="number" step="0.01" class="form-control" id="crypto_commission" name="crypto_commission">
-        </div>
-        <div class="mb-3">
-            <label for="crypto_broker" class="form-label">Broker / Plataforma</label>
-            <input type="text" class="form-control" id="crypto_broker" name="crypto_broker">
-        </div>
-    </div>
-    <button type="submit" class="btn btn-success w-100">
-        <i class="fab fa-bitcoin me-2"></i>Agregar Cripto
-    </button>
-</form>
+                                <form id="addCryptoForm" class="p-3">
+                                    <div class="mb-3">
+                                        <label for="crypto_name" class="form-label">Criptomoneda</label>
+                                        <input type="text" class="form-control" id="crypto_name" name="crypto_name" placeholder="bitcoin,BTC" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="crypto_quantity" class="form-label">Cantidad</label>
+                                        <input type="number" step="0.00000001" class="form-control" id="crypto_quantity" name="crypto_quantity" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="crypto_purchase_price" class="form-label">Precio de Compra</label>
+                                        <input type="number" step="0.01" class="form-control" id="crypto_purchase_price" name="crypto_purchase_price" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="crypto_currency" class="form-label">Divisa</label>
+                                        <select class="form-control" id="crypto_currency" name="crypto_currency">
+                                            <option value="USD">USD</option>
+                                            <option value="EUR">EUR</option>
+                                            <option value="COP">COP</option>
+                                            <option value="MXN">MXN</option>
+                                        </select>
+                                    </div>
+                                    <button type="button" class="btn btn-outline-dark mb-2" id="toggleDetailsCrypto">+ Más Detalle</button>
+                                    <div id="cryptoDetails">
+                                        <div class="mb-3">
+                                            <label for="crypto_purchase_date" class="form-label">Fecha de compra</label>
+                                            <input type="date" class="form-control" id="crypto_purchase_date" name="crypto_purchase_date">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="crypto_notes" class="form-label">Notas o Comentarios</label>
+                                            <textarea class="form-control" id="crypto_notes" name="crypto_notes"></textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="crypto_commission" class="form-label">Comisión</label>
+                                            <input type="number" step="0.01" class="form-control" id="crypto_commission" name="crypto_commission">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="crypto_broker" class="form-label">Broker / Plataforma</label>
+                                            <input type="text" class="form-control" id="crypto_broker" name="crypto_broker">
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-success w-100">
+                                        <i class="fab fa-bitcoin me-2"></i>Agregar Cripto
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -243,8 +262,8 @@
                 <div class="card">
                     <div class="card-header">
                         <i class="fas fa-chart-line me-2"></i>Mi Portafolio
-                        <button class="btn btn-sm btn-outline-dark float-end" id="refreshBtn">
-                      
+                        <button class="btn btn-sm btn-outline-dark float-end" id="refreshBtn" title="Actualizar portafolio" aria-label="Actualizar portafolio">
+                            <i class="fas fa-sync-alt"></i>
                         </button>
                     </div>
                     <div class="card-body">
@@ -275,36 +294,6 @@
                     </div>
                 </div>
 
-                <!-- Gráfica de Rendimiento Ponderado -->
-                <div class="card mt-4">
-                    <div class="card-header d-flex align-items-center justify-content-between">
-                        <span>
-                            <i class="fas fa-mountain me-2 text-primary"></i>
-                            <span id="performanceChartTitle">Rendimiento Ponderado (%)</span>
-                        </span>
-                        <div class="d-flex gap-2">
-                            <button class="btn btn-outline-primary btn-sm" id="showWeightedPerformanceChart">
-                                <i class="fas fa-percentage me-1"></i>Rendimiento (%)
-                            </button>
-                            <button class="btn btn-outline-success btn-sm" id="showTotalValueChart">
-                                <i class="fas fa-dollar-sign me-1"></i>Valor Total
-                            </button>
-                            <button class="btn btn-outline-info btn-sm" id="downloadChartBtn" title="Descargar gráfica">
-                                <i class="fas fa-download"></i>
-                            </button>
-                            <button class="btn btn-outline-secondary btn-sm" id="refreshChartBtn" title="Actualizar datos">
-                                <i class="fas fa-sync-alt"></i>
-                            </button>
-                            <button class="btn btn-outline-dark btn-sm" id="helpChartBtn" title="Ayuda sobre la gráfica">
-                                <i class="fas fa-question-circle"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="weightedPerformanceChart" height="90"></canvas>
-                    </div>
-                </div>
-
                 <!-- Ajustes de Cuenta -->
                 <div class="card mt-4">
                     <div class="card-header">
@@ -313,32 +302,31 @@
                     <div class="card-body">
                         <!-- Datos Personales -->
                         <div class="card-setting datos-personales mb-4">
-    <div class="section-title">
-        <i class="fas fa-user"></i>
-        <span data-i18n="datos_personales">Datos personales</span>
-    </div>
-    <div class="setting-row">
-        <span class="setting-label" data-i18n="correo">Correo electrónico</span>
-        <span id="userEmail">usuario@email.com</span>
-        <button class="btn btn-outline-info btn-sm d-flex align-items-center gap-2"
-                onclick="showEmailModal()" data-i18n="cambiar">
-            <i class="fas fa-pen"></i>
-            <span>Cambiar</span>
-        </button>
-    </div>
-    <div class="setting-row">
-        <span class="setting-label" data-i18n="contraseña">Contraseña</span>
-        <span>••••••••</span>
-        <button class="btn btn-outline-warning btn-sm d-flex align-items-center gap-2"
-                onclick="alert('Función de cambio de contraseña próximamente')" data-i18n="cambiar">
-            <i class="fas fa-key"></i>
-            <span>Cambiar</span>
-        </button>
-    </div>
-</div>
+                            <div class="section-title">
+                                <i class="fas fa-user"></i>
+                                <span data-i18n="datos_personales">Datos personales</span>
+                            </div>
+                            <div class="setting-row">
+                                <span class="setting-label" data-i18n="correo">Correo electrónico</span>
+                                <span id="userEmail">usuario@email.com</span>
+                                <button class="btn btn-outline-info btn-sm d-flex align-items-center gap-2"
+                                        onclick="showEmailModal()" data-i18n="cambiar">
+                                    <i class="fas fa-pen"></i>
+                                    <span>Cambiar</span>
+                                </button>
+                            </div>
+                            <div class="setting-row">
+                                <span class="setting-label" data-i18n="contraseña">Contraseña</span>
+                                <span>••••••••</span>
+                                <button class="btn btn-outline-warning btn-sm d-flex align-items-center gap-2"
+                                        onclick="alert('Función de cambio de contraseña próximamente')" data-i18n="cambiar">
+                                    <i class="fas fa-key"></i>
+                                    <span>Cambiar</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-             
             </div>
         </div>
 
@@ -348,7 +336,7 @@
                 <div class="modal-content bg-white dark-mode">
                     <div class="modal-header border-secondary">
                         <h5 class="modal-title">Editar Activo</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                     </div>
                     <div class="modal-body">
                         <form id="editAssetForm">
@@ -381,7 +369,7 @@
                 <div class="modal-content bg-white dark-mode">
                     <div class="modal-header border-secondary">
                         <h5 class="modal-title">Detalles del Activo</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                     </div>
                     <div class="modal-body" id="viewDetailsContent">
                     </div>
@@ -394,9 +382,9 @@
 
         <!-- Bootstrap 5 JS -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<!-- Chart.js para gráficas -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script type="module" src="home.js"></script>
+        <!-- Chart.js para gráficas -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script type="module" src="home.js"></script>
     </div>
 </body>
 </html>

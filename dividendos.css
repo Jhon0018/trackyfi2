@@ -1,0 +1,78 @@
+body {
+    background: #fff;
+    color: #181818;
+    font-family: 'Inter', Arial, sans-serif;
+}
+.div-card {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 4px 32px 0 rgba(0,0,0,0.07);
+    padding: 32px 24px;
+    max-width: 520px;
+    margin: 48px auto 0 auto;
+}
+.div-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 18px;
+    color: #181818;
+    letter-spacing: -1px;
+}
+#divForm input {
+    border-radius: 7px;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    color: #181818;
+    font-size: 1.1rem;
+    padding: 10px 14px;
+}
+#divForm button[type="submit"] {
+    background: #181818;
+    color: #fff;
+    border: none;
+    border-radius: 7px;
+    padding: 10px 28px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: background 0.2s;
+    margin-top: 10px;
+}
+#divForm button[type="submit"]:hover {
+    background: #333;
+}
+#divResult {
+    margin-top: 28px;
+}
+#divResult h5 {
+    color: #222;
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+}
+#divResult table {
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+}
+#divResult th, #divResult td {
+    color: #181818;
+    font-size: 1rem;
+    padding: 6px 12px;
+}
+#divResult th {
+    background: #f3f3f3;
+    font-weight: 600;
+}
+#divResult tr:nth-child(even) {
+    background: #fafafa;
+}
+.alert-danger {
+    background: #181818;
+    color: #fff;
+    border: none;
+}
+@media (max-width: 600px) {
+    .div-card {
+        padding: 16px 4vw;
+        max-width: 98vw;
+    }
+}

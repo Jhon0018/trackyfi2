@@ -2,9 +2,26 @@
 body {
     background: #fff;
     color: #18181b;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif;
     min-height: 100vh;
     transition: background 0.4s, color 0.3s;
+}
+
+/* Fuente profesional para todo el dashboard */
+.dashboard-container,
+.stats-card,
+.table,
+.modal-content,
+.form-control,
+.form-label,
+.navbar,
+#sidebar,
+.card,
+.card-header,
+.card-body,
+.btn,
+.alert {
+    font-family: 'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif !important;
 }
 
 /* --------- SIDEBAR --------- */
@@ -48,6 +65,7 @@ body {
 /* --------- NAVBAR --------- */
 .navbar {
     background: rgba(255,255,255,0.97);
+    -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
     border-bottom: 1px solid #e5e7eb;
     box-shadow: 0 2px 8px rgba(0,0,0,0.03);
@@ -375,7 +393,6 @@ body.dark-mode a:hover {
     #sidebar {
         position: static !important;
         width: 100% !important;
-        min-height: auto !important;
         border-right: none !important;
         border-bottom: 1.5px solid #e5e7eb;
         height: auto !important;
@@ -634,4 +651,87 @@ body.dark-mode #weightedPerformanceChart {
 .card-header .btn-primary,
 .card-header .btn-success {
     color: #fff !important;
+}
+
+/* Modo oscuro para la tarjeta de capital total */
+body.dark-mode .card,
+body.dark-mode .card-header,
+body.dark-mode .card-body {
+    background: #181a1b !important;
+    color: #f3f3f3 !important;
+    border-color: #23272b !important;
+}
+
+body.dark-mode .card-header svg,
+body.dark-mode .card-header .fw-semibold,
+body.dark-mode .card-header .badge {
+    color: #f3f3f3 !important;
+    background: transparent !important;
+}
+
+body.dark-mode .bg-light,
+body.dark-mode .p-3.rounded.bg-light,
+body.dark-mode .min-height-340 {
+    background: #23272b !important;
+    color: #f3f3f3 !important;
+}
+
+body.dark-mode .bg-white,
+body.dark-mode .border,
+body.dark-mode .shadow-sm {
+    background: #23272b !important;
+    color: #f3f3f3 !important;
+    border-color: #23272b !important;
+}
+
+body.dark-mode .text-muted,
+body.dark-mode .font-size-105 {
+    color: #b0b3b8 !important;
+}
+
+body.dark-mode .fw-bold.text-primary {
+    color: #7abaff !important;
+}
+body.dark-mode .fw-bold.text-success {
+    color: #6ee7b7 !important;
+}
+body.dark-mode .fw-bold.text-warning {
+    color: #fbbf24 !important;
+}
+
+body.dark-mode .badge.bg-light.text-secondary {
+    background: #23272b !important;
+    color: #b0b3b8 !important;
+    border: 1px solid #23272b;
+}
+
+/* Letras blancas dentro del área de la gráfica en modo oscuro */
+body.dark-mode #capitalLineChart,
+body.dark-mode .p-3.rounded.bg-light,
+body.dark-mode .min-height-340 {
+    color: #fff !important;
+}
+
+/* Si usas Chart.js, fuerza los tooltips y leyendas a blanco en modo oscuro */
+body.dark-mode .chartjs-tooltip,
+body.dark-mode .chartjs-legend,
+body.dark-mode .chartjs-size-monitor,
+body.dark-mode .chartjs-title,
+body.dark-mode .chartjs-label,
+body.dark-mode .chartjs-axis,
+body.dark-mode .chartjs-tick {
+    color: #fff !important;
+}
+
+/* Si tienes textos personalizados cerca del canvas */
+body.dark-mode #capitalLineChart + * {
+    color: #fff !important;
+}
+
+/* Forzar ancho completo y ajuste de caja para el gráfico y su contenedor en modo oscuro */
+.p-3.rounded.bg-light.min-height-340,
+#capitalLineChart {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
 }

@@ -1,0 +1,149 @@
+/* Fondo general blanco y texto oscuro */
+body {
+    background: #fff;
+    color: #181818;
+    font-family: 'Inter', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Contenedor principal amplio y elegante */
+.compound-container {
+    max-width: 600px;
+    margin: 48px auto 0 auto;
+    padding: 32px 24px;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 4px 32px 0 rgba(0,0,0,0.07);
+}
+
+/* Título */
+.compound-title {
+    font-size: 2.1rem;
+    font-weight: 700;
+    margin-bottom: 18px;
+    color: #181818;
+    letter-spacing: -1px;
+    text-align: center;
+}
+
+/* Formulario */
+#compoundInterestForm {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 28px 22px 18px 22px;
+    box-shadow: 0 2px 12px 0 rgba(0,0,0,0.04);
+    margin-bottom: 32px;
+}
+
+#compoundInterestForm label {
+    font-weight: 600;
+    color: #222;
+}
+
+#compoundInterestForm input,
+#compoundInterestForm select {
+    border-radius: 7px;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    color: #181818;
+    font-size: 1rem;
+    padding: 8px 12px;
+    margin-bottom: 12px;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+#compoundInterestForm input:focus,
+#compoundInterestForm select:focus {
+    border-color: #181818;
+    outline: none;
+}
+
+#compoundInterestForm button[type="submit"] {
+    background: #181818;
+    color: #fff;
+    border: none;
+    border-radius: 7px;
+    padding: 10px 28px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: background 0.2s;
+    margin-top: 10px;
+    width: 100%;
+}
+
+#compoundInterestForm button[type="submit"]:hover {
+    background: #333;
+}
+
+/* Resultado */
+#compoundInterestResult {
+    font-size: 1.25rem;
+    margin: 24px 0 18px 0;
+    color: #181818;
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-weight: 500;
+    text-align: center;
+}
+
+/* Gráfica: ocupa todo el ancho disponible */
+#compoundInterestChart {
+    width: 100% !important;
+    min-height: 340px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px 0 rgba(0,0,0,0.04);
+    margin-bottom: 24px;
+    padding: 12px;
+}
+
+/* Tabla de resultados */
+.compound-table {
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+    margin-top: 18px;
+    box-shadow: 0 1px 6px 0 rgba(0,0,0,0.03);
+}
+
+.compound-table th, .compound-table td {
+    color: #181818;
+    font-size: 1rem;
+    padding: 8px 12px;
+}
+
+.compound-table th {
+    background: #f3f3f3;
+    font-weight: 600;
+}
+
+.compound-table tr:nth-child(even) {
+    background: #fafafa;
+}
+
+/* Alertas */
+.alert-danger {
+    background: #181818;
+    color: #fff;
+    border: none;
+    text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+    .compound-container {
+        padding: 16px 4vw;
+        max-width: 98vw;
+    }
+    #compoundInterestForm {
+        padding: 18px 8px 10px 8px;
+    }
+    #compoundInterestChart {
+        min-height: 220px;
+    }
+}

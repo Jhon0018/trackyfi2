@@ -16,13 +16,13 @@
 <body>
     <div class="floating-shapes">
         <div class="shape">
-            <i class="fas fa-chart-line" style="font-size: 3rem; color: #000;"></i>
+            <i class="fas fa-chart-line chart-line-icon"></i>
         </div>
         <div class="shape">
-            <i class="fas fa-coins" style="font-size: 2.5rem; color: #000;"></i>
+            <i class="fas fa-coins coins-icon"></i>
         </div>
         <div class="shape">
-            <i class="fas fa-trending-up" style="font-size: 3.5rem; color: #000;"></i>
+            <i class="fas fa-trending-up trending-up-icon"></i>
         </div>
     </div>
 
@@ -127,8 +127,8 @@
         <div class="container">
             <div class="row text-center mb-5">
                 <div class="col-12">
-                    <h2 class="display-5 fw-bold mb-3" style="color:rgb(116, 114, 114);">¿Por qué elegir Trackerfolio?</h2>
-                    <p class="lead" style="color:rgb(119, 119, 119);">Potencia tu estrategia de inversión con nuestras herramientas avanzadas</p>
+                    <h2 class="display-5 fw-bold mb-3 trackerfolio-title">¿Por qué elegir Trackerfolio?</h2>
+                    <p class="lead text-secondary-custom">Potencia tu estrategia de inversión con nuestras herramientas avanzadas</p>
                 </div>
             </div>
             <div class="row g-4">
@@ -214,7 +214,7 @@
             <div class="row justify-content-center">
                 <div class="col-md-7">
                     <div class="login-form">
-                        <h3 class="text-center mb-4" style="color:rgb(134, 133, 133);" id="authTitle">Iniciar Sesión</h3>
+                        <h3 class="text-center mb-4 auth-title-color" id="authTitle">Iniciar Sesión</h3>
                         
                         <div id="alertContainer"></div>
                         
@@ -243,17 +243,17 @@
                                 <div class="form-check d-flex justify-content-center">
                                     <input class="form-check-input me-2" type="checkbox" id="termsCheck">
                                     <label class="form-check-label small" for="termsCheck">
-                                        Acepto los <a href="#" target="_blank" style="text-decoration: underline;">Términos y Condiciones</a>
+                                        Acepto los <a href="#" target="_blank" class="terms-link">Términos y Condiciones</a>
                                     </label>
                                 </div>
                             </div>
                             <div class="text-center mb-2 mt-3">
-                                <button type="button" class="btn btn-link" id="forgotPasswordBtn" style="color: #3b82f6;">
+                                <button type="button" class="btn btn-link forgot-password-link" id="forgotPasswordBtn">
                                     ¿Olvidaste tu contraseña?
                                 </button>
                             </div>
                             <div class="text-center">
-                                <button class="btn btn-link" id="toggleAuthBtn" style="color: #3b82f6;">
+                                <button class="btn btn-link" id="toggleAuthBtn" type="button">
                                     ¿No tienes cuenta? Regístrate
                                 </button>
                             </div>
@@ -261,7 +261,7 @@
                         
                         <!-- Botón de autenticación con Google -->
                         <button type="button" class="btn btn-outline-dark w-100 mb-3 d-flex align-items-center justify-content-center" id="googleAuthBtn">
-    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" style="width:24px; height:24px; margin-right:8px;">
+    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="google-auth-icon">
     Continuar con Google
 </button>
 
