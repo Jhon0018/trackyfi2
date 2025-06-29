@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Calculadora de Préstamos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap y Plotly -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #f8fafc; }
+        .container { max-width: 900px; margin-top: 40px; }
+        .table-responsive { max-height: 350px; overflow-y: auto; }
+        .plotly-graph-div { background: #fff; border-radius: 12px; }
+        .result-section { display: none; }
+        .fade-in { animation: fadeIn 0.7s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 class="mb-4 text-center"><i class="fas fa-calculator"></i> Calculadora de Préstamos</h2>
+    <form id="loanForm" class="row g-3 mb-4 needs-validation" novalidate>
+        <div class="col-md-3">
+            <label for="importe" class="form-label">Importe del préstamo ($)</label>
+            <input type="number" class="form-control" id="importe" required min="1" step="0.01">
+            <div class="invalid-feedback">Ingrese un importe válido.</div>
+        </div>
+        <div class="col-md-3">
+            <label for="interes" class="form-label">Interés anual (%)</label>
+            <input type="number" class="form-control" id="interes" required min="0" step="0.01">
+            <div class="invalid-feedback">Ingrese un interés válido.</div>
+        </div>
+        <div class="col-md-3">
+            <label for="meses" class="form-label">Meses</label>
+            <input type="number" class="form-control" id="meses" required min="1" step="1">
+            <div class="invalid-feedback">Ingrese un número de meses válido.</div>
+        </div>
+        <div class="col-md-3">
+            <label for="tipo" class="form-label">Tipo de préstamo</label>
+            <select class="form-select" id="tipo" required>
+                <option value="personal">Personal</option>
+                <option value="empresa/autónomo">Empresa/Autónomo</option>
+            </select>
+            <div class="invalid-feedback">Seleccione un tipo de préstamo.</div>
+        </div>
+        <div class="col-12 text-end">
+            <button type="submit" class="btn btn-primary">Calcular</button>
+        </div>
+    </form>
+
+    <div id="resultados" class="result-section fade-in">
+        <div id="resumenAnual" class="mb-4"></div>
+        <div id="grafico" class="mb-4"></div>
+        <div id="tablaMensual" class="mb-4"></div>
+        <div id="totalIntereses" class="alert alert-info d-none"></div>
+    </div>
+</div>
+
+<script>
+function formatMoney(n) {
+    return "$" + n.toLocaleString("es-ES", {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+function calcularPrestamo(importe, interesAnual, meses) {
+    const interesMensual = interesAnual / 100 / 12;
+    let cuota;
+    if (interesMensual === 0) {
+        cuota = importe / meses;
+    } else {
+        cuota = importe * interesMensual / (1 - Math.pow(1 + interesMensual, -meses));
+    }
+    let saldo = importe;
+    const datos = [];
+    for (let mes = 1; mes <= meses; mes++) {
+        const interesMes = saldo * interesMensual;
+        const principalMes = cuota - interesMes;
+        saldo -= principalMes;
+        datos.push({
+            "Año": Math.floor((mes - 1) / 12) + 1,
+            "Mes": mes,
+            "Cuota": cuota,
+            "Interés": interesMes,
+            "Principal": principalMes,
+            "Saldo restante": Math.max(saldo, 0)
+        });
+    }
+    return datos;
+}
+
+function resumenAnual(datos) {
+    const resumen = {};
+    datos.forEach(row => {
+        const a = row["Año"];
+        if (!resumen[a]) resumen[a] = {Cuota:0, Interés:0, Principal:0};
+        resumen[a].Cuota += row.Cuota;
+        resumen[a].Interés += row["Interés"];
+        resumen[a].Principal += row["Principal"];
+    });
+    return Object.entries(resumen).map(([Año, vals]) => ({
+        Año: +Año,
+        Cuota: vals.Cuota,
+        Interés: vals.Interés,
+        Principal: vals.Principal,
+        "Total pagado": vals.Cuota
+    }));
+}
+
+function tablaHTML(datos, campos, titulos) {
+    let html = `<div class="table-responsive"><table class="table table-sm table-bordered align-middle"><thead><tr>`;
+    titulos.forEach(t => html += `<th>${t}</th>`);
+    html += `</tr></thead><tbody>`;
+    datos.forEach(row => {
+        html += "<tr>";
+        campos.forEach(c => {
+            html += `<td>${typeof row[c] === "number" ? formatMoney(row[c]) : row[c]}</td>`;
+        });
+        html += "</tr>";
+    });
+    html += "</tbody></table></div>";
+    return html;
+}
+
+// Validación Bootstrap
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            form.classList.add('was-validated')
+        }, false)
+    })
+})();
+
+document.getElementById("loanForm").onsubmit = function(e) {
+    e.preventDefault();
+
+    // Validación manual extra
+    const importe = parseFloat(document.getElementById("importe").value);
+    const interes = parseFloat(document.getElementById("interes").value);
+    const meses = parseInt(document.getElementById("meses").value);
+    const tipo = document.getElementById("tipo").value;
+
+    if (isNaN(importe) || importe <= 0 ||
+        isNaN(interes) || interes < 0 ||
+        isNaN(meses) || meses < 1 ||
+        !tipo) {
+        return false;
+    }
+
+    const datos = calcularPrestamo(importe, interes, meses);
+    const resumen = resumenAnual(datos);
+
+    // Tabla resumen anual
+    document.getElementById("resumenAnual").innerHTML =
+        `<h5>Resumen anual</h5>` +
+        tablaHTML(resumen, ["Año","Cuota","Interés","Principal","Total pagado"],
+            ["Año","Cuota","Interés","Principal","Total pagado"]);
+
+    // Tabla mensual
+    document.getElementById("tablaMensual").innerHTML =
+        `<h5>Tabla de amortización mensual</h5>` +
+        tablaHTML(datos, ["Mes","Año","Cuota","Interés","Principal","Saldo restante"],
+            ["Mes","Año","Cuota","Interés","Principal","Saldo restante"]);
+
+    // Total intereses
+    const totalIntereses = datos.reduce((acc, r) => acc + r["Interés"], 0);
+    const totalDiv = document.getElementById("totalIntereses");
+    totalDiv.textContent = `💰 Total pagado en intereses: ${formatMoney(totalIntereses)}`;
+    totalDiv.classList.remove("d-none");
+
+    // Gráfico Plotly
+    const tracePrincipal = {
+        x: resumen.map(r => r.Año),
+        y: resumen.map(r => r.Principal),
+        name: "Principal pagado",
+        type: "bar",
+        marker: {color: "green"}
+    };
+    const traceInteres = {
+        x: resumen.map(r => r.Año),
+        y: resumen.map(r => r.Interés),
+        name: "Interés pagado",
+        type: "bar",
+        marker: {color: "orange"}
+    };
+    const layout = {
+        title: "Distribución de pagos por año",
+        barmode: "stack",
+        xaxis: {title: "Año"},
+        yaxis: {title: "Monto pagado ($)"},
+        legend: {title: {text: "Componentes del pago"}}
+    };
+    Plotly.newPlot("grafico", [tracePrincipal, traceInteres], layout, {responsive:true});
+
+    // Mostrar resultados
+    document.getElementById("resultados").style.display = "block";
+};
+</script>
+</body>
+</html>

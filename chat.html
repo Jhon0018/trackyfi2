@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Muro Social - Trackfolio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --facebook-blue: #1877f2;
+            --facebook-blue-hover: #166fe5;
+            --facebook-blue-light: #e7f3ff;
+            --facebook-green: #42b883;
+            --facebook-gray: #65676b;
+            --facebook-gray-light: #f0f2f5;
+            --facebook-gray-medium: #e4e6ea;
+            --facebook-gray-dark: #606770;
+            --facebook-white: #ffffff;
+            --facebook-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            --facebook-shadow-hover: 0 8px 16px rgba(0, 0, 0, 0.15);
+            --facebook-border-radius: 8px;
+            --facebook-border-radius-large: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--facebook-gray-light);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: var(--facebook-gray);
+            line-height: 1.34;
+        }
+
+        .main-container {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 20px 16px;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--facebook-white);
+            border-radius: var(--facebook-border-radius-large);
+            box-shadow: var(--facebook-shadow);
+            padding: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: var(--facebook-blue);
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .header h1 i {
+            font-size: 32px;
+        }
+
+        .header p {
+            color: var(--facebook-gray-dark);
+            font-size: 16px;
+            margin: 0;
+        }
+
+        .post-composer {
+            background: var(--facebook-white);
+            border-radius: var(--facebook-border-radius-large);
+            box-shadow: var(--facebook-shadow);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .composer-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--facebook-gray-medium);
+        }
+
+        .composer-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .composer-user {
+            flex: 1;
+        }
+
+        .composer-username {
+            font-weight: 600;
+            color: var(--facebook-gray);
+            font-size: 15px;
+        }
+
+        .composer-status {
+            font-size: 13px;
+            color: var(--facebook-gray-dark);
+            margin-top: 2px;
+        }
+
+        .post-textarea {
+            width: 100%;
+            border: none;
+            outline: none;
+            resize: none;
+            font-size: 16px;
+            color: var(--facebook-gray);
+            background: transparent;
+            min-height: 80px;
+            font-family: inherit;
+            line-height: 1.4;
+        }
+
+        .post-textarea::placeholder {
+            color: var(--facebook-gray-dark);
+        }
+
+        .composer-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px solid var(--facebook-gray-medium);
+        }
+
+        .char-counter {
+            font-size: 13px;
+            color: var(--facebook-gray-dark);
+        }
+
+        .char-counter.warning {
+            color: #e41e3f;
+        }
+
+        .btn-post {
+            background-color: var(--facebook-blue);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-post:hover:not(:disabled) {
+            background-color: var(--facebook-blue-hover);
+        }
+
+        .btn-post:disabled {
+            background-color: var(--facebook-gray-medium);
+            cursor: not-allowed;
+        }
+
+        .user-status {
+            background-color: var(--facebook-blue-light);
+            border-radius: var(--facebook-border-radius);
+            padding: 12px;
+            margin-top: 12px;
+            font-size: 14px;
+            text-align: center;
+            border: 1px solid rgba(24, 119, 242, 0.2);
+        }
+
+        .user-status.unauthenticated {
+            background-color: #fff3cd;
+            border-color: #ffeaa7;
+            color: #856404;
+        }
+
+        .user-status i {
+            margin-right: 8px;
+        }
+
+        .messages-feed {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .message-card {
+            background: var(--facebook-white);
+            border-radius: var(--facebook-border-radius-large);
+            box-shadow: var(--facebook-shadow);
+            padding: 20px;
+            transition: box-shadow 0.2s;
+        }
+
+        .message-card:hover {
+            box-shadow: var(--facebook-shadow-hover);
+        }
+
+        .message-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .message-user-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .message-username {
+            font-weight: 600;
+            color: var(--facebook-gray);
+            font-size: 15px;
+            margin-bottom: 2px;
+        }
+
+        .message-timestamp {
+            font-size: 13px;
+            color: var(--facebook-gray-dark);
+        }
+
+        .message-content {
+            font-size: 16px;
+            color: var(--facebook-gray);
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .message-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-top: 12px;
+            padding-top: 8px;
+            border-top: 1px solid var(--facebook-gray-medium);
+        }
+
+        .message-action {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--facebook-gray-dark);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+        }
+
+        .message-action:hover {
+            background-color: var(--facebook-gray-light);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: var(--facebook-white);
+            border-radius: var(--facebook-border-radius-large);
+            box-shadow: var(--facebook-shadow);
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            color: var(--facebook-gray-medium);
+            margin-bottom: 16px;
+        }
+
+        .empty-state h3 {
+            color: var(--facebook-gray);
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            color: var(--facebook-gray-dark);
+            font-size: 16px;
+        }
+
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            background: var(--facebook-white);
+            border-radius: var(--facebook-border-radius-large);
+            box-shadow: var(--facebook-shadow);
+        }
+
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid var(--facebook-gray-medium);
+            border-top: 3px solid var(--facebook-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .scroll-to-top {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            background: var(--facebook-blue);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            box-shadow: var(--facebook-shadow-hover);
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.3s;
+            opacity: 0;
+            visibility: hidden;
+            z-index: 1000;
+        }
+
+        .scroll-to-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .scroll-to-top:hover {
+            background-color: var(--facebook-blue-hover);
+            transform: translateY(-2px);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 12px 8px;
+            }
+            
+            .header {
+                padding: 20px 16px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .header h1 i {
+                font-size: 28px;
+            }
+            
+            .post-composer, .message-card {
+                padding: 16px;
+            }
+            
+            .scroll-to-top {
+                bottom: 16px;
+                right: 16px;
+                width: 48px;
+                height: 48px;
+                font-size: 18px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-container {
+                padding: 8px 4px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .composer-header, .message-header {
+                gap: 8px;
+            }
+            
+            .composer-avatar, .message-avatar {
+                width: 36px;
+                height: 36px;
+            }
+            
+            .message-actions {
+                gap: 12px;
+            }
+            
+            .message-action {
+                padding: 6px 8px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="header">
+            <h1>
+                <i class="fab fa-facebook-messenger"></i>
+                Trackfolio Social
+            </h1>
+            <p>Conecta y comparte con la comunidad</p>
+        </div>
+
+        <div class="post-composer">
+            <div class="composer-header">
+                <img id="composerAvatar" src="" class="composer-avatar" alt="Tu avatar">
+                <div class="composer-user">
+                    <div class="composer-username" id="composerUsername">Usuario</div>
+                    <div class="composer-status" id="composerStatus">¿Qué estás pensando?</div>
+                </div>
+            </div>
+
+            <form id="messageForm">
+                <textarea 
+                    id="messageInput" 
+                    class="post-textarea" 
+                    placeholder="¿Qué está pasando?"
+                    maxlength="500"
+                    required
+                ></textarea>
+                
+                <div class="composer-actions">
+                    <div class="char-counter">
+                        <span id="charCount">0</span>/500
+                    </div>
+                    <button type="submit" class="btn-post" id="sendBtn">
+                        <i class="fas fa-paper-plane"></i>
+                        Publicar
+                    </button>
+                </div>
+            </form>
+
+            <div id="userInfo" class="user-status"></div>
+        </div>
+
+        <div id="messages" class="messages-feed">
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+            </div>
+        </div>
+    </div>
+
+    <button id="scrollTopBtn" class="scroll-to-top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+
+    <script>
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBj0vG5CgWxEBrvkNBMvMU9TFcKuqLP0cc",
+            authDomain: "trackyfi-317e1.firebaseapp.com",
+            databaseURL: "https://trackyfi-317e1-default-rtdb.firebaseio.com",
+            projectId: "trackyfi-317e1",
+            storageBucket: "trackyfi-317e1.appspot.com",
+            messagingSenderId: "843779589124",
+            appId: "1:843779589124:web:d782b98668b1c16ce0a151"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const auth = firebase.auth();
+        const messagesRef = db.ref("social-messages");
+
+        // Variables globales
+        let currentUser = null;
+        let messages = [];
+        let isLoading = true;
+
+        // Elementos DOM
+        const messagesContainer = document.getElementById('messages');
+        const messageInput = document.getElementById('messageInput');
+        const userInfo = document.getElementById('userInfo');
+        const sendBtn = document.getElementById('sendBtn');
+        const scrollBtn = document.getElementById('scrollTopBtn');
+        const charCount = document.getElementById('charCount');
+        const composerAvatar = document.getElementById('composerAvatar');
+        const composerUsername = document.getElementById('composerUsername');
+        const composerStatus = document.getElementById('composerStatus');
+
+        // Contador de caracteres
+        messageInput.addEventListener('input', function() {
+            const count = this.value.length;
+            charCount.textContent = count;
+            charCount.classList.toggle('warning', count > 400);
+            
+            // Auto-resize textarea
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+
+        // Función para formatear tiempo relativo (estilo Facebook)
+        function getRelativeTime(timestamp) {
+            const now = Date.now();
+            const diff = now - timestamp;
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+            const weeks = Math.floor(diff / 604800000);
+
+            if (minutes < 1) return 'Ahora';
+            if (minutes === 1) return '1 min';
+            if (minutes < 60) return `${minutes} min`;
+            if (hours === 1) return '1 h';
+            if (hours < 24) return `${hours} h`;
+            if (days === 1) return 'Ayer';
+            if (days < 7) return `${days} d`;
+            if (weeks === 1) return '1 sem';
+            if (weeks < 4) return `${weeks} sem`;
+            
+            return new Date(timestamp).toLocaleDateString('es-ES', {
+                day: 'numeric',
+                month: 'short'
+            });
+        }
+
+        // Función para generar avatar estilo Facebook
+        function generateAvatar(email) {
+            const name = email.split('@')[0];
+            const colors = ['4267B2', '42B883', 'EA4335', 'FBBC05', '34A853', 'FF6B6B', '4ECDC4', '45B7D1'];
+            const colorIndex = name.length % colors.length;
+            return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=${colors[colorIndex]}&color=fff&rounded=true&size=80&font-size=0.4`;
+        }
+
+        // Función para renderizar mensajes
+        function renderMessages() {
+            if (isLoading) return;
+
+            if (messages.length === 0) {
+                messagesContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="far fa-comment-dots"></i>
+                        <h3>¡Sé el primero en publicar!</h3>
+                        <p>Comparte algo interesante con la comunidad</p>
+                    </div>
+                `;
+                return;
+            }
+
+            messagesContainer.innerHTML = messages.map(msg => `
+                <div class="message-card">
+                    <div class="message-header">
+                        <img src="${generateAvatar(msg.username)}" class="message-avatar" alt="Avatar">
+                        <div class="message-user-info">
+                            <div class="message-username">${msg.username.split('@')[0]}</div>
+                            <div class="message-timestamp">${getRelativeTime(msg.timestamp)}</div>
+                        </div>
+                    </div>
+                    <div class="message-content">${msg.text.replace(/\n/g, '<br>')}</div>
+                    <div class="message-actions">
+                        <div class="message-action">
+                            <i class="far fa-thumbs-up"></i>
+                            Me gusta
+                        </div>
+                        <div class="message-action">
+                            <i class="far fa-comment"></i>
+                            Comentar
+                        </div>
+                        <div class="message-action">
+                            <i class="far fa-share"></i>
+                            Compartir
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Escuchar cambios en tiempo real
+        messagesRef.on("value", snapshot => {
+            messages = [];
+            snapshot.forEach(child => {
+                const msg = child.val();
+                msg._key = child.key;
+                messages.push(msg);
+            });
+            
+            messages.sort((a, b) => b.timestamp - a.timestamp);
+            isLoading = false;
+            renderMessages();
+            
+            // Actualizar timestamps
+            clearInterval(window.timeUpdateInterval);
+            window.timeUpdateInterval = setInterval(renderMessages, 60000);
+        });
+
+        // Scroll to top functionality
+        window.addEventListener('scroll', function() {
+            scrollBtn.classList.toggle('show', window.scrollY > 300);
+        });
+
+        scrollBtn.addEventListener('click', function() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Manejo de autenticación
+        auth.onAuthStateChanged(user => {
+            currentUser = user;
+            if (user) {
+                const username = user.email.split('@')[0];
+                const avatar = generateAvatar(user.email);
+                
+                composerAvatar.src = avatar;
+                composerUsername.textContent = username;
+                composerStatus.textContent = '¿Qué estás pensando?';
+                
+                userInfo.innerHTML = `
+                    <i class="fas fa-check-circle"></i>
+                    Conectado como <strong>${username}</strong>
+                `;
+                userInfo.className = 'user-status';
+                sendBtn.disabled = false;
+            } else {
+                composerAvatar.src = 'https://ui-avatars.com/api/?name=?&background=ddd&color=999&rounded=true&size=80';
+                composerUsername.textContent = 'Invitado';
+                composerStatus.textContent = 'Inicia sesión para publicar';
+                
+                userInfo.innerHTML = `
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Debes iniciar sesión para publicar mensajes
+                `;
+                userInfo.className = 'user-status unauthenticated';
+                sendBtn.disabled = true;
+            }
+        });
+
+        // Envío de mensajes
+        document.getElementById('messageForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!currentUser) {
+                alert('Debes iniciar sesión para publicar');
+                return;
+            }
+
+            const text = messageInput.value.trim();
+            if (!text) return;
+
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publicando...';
+
+            const message = {
+                username: currentUser.email,
+                text: text,
+                timestamp: Date.now()
+            };
+
+            messagesRef.push(message)
+                .then(() => {
+                    messageInput.value = '';
+                    charCount.textContent = '0';
+                    charCount.classList.remove('warning');
+                    messageInput.style.height = 'auto';
+                    
+                    setTimeout(() => {
+                        window.scrollTo({
+                            top: 0,
+                            behavior: 'smooth'
+                        });
+                    }, 100);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al enviar el mensaje');
+                })
+                .finally(() => {
+                    sendBtn.disabled = !currentUser;
+                    sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Publicar';
+                });
+        });
+
+        // Envío con Ctrl+Enter
+        messageInput.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('messageForm').dispatchEvent(new Event('submit'));
+            }
+        });
+
+        // Limpieza
+        window.addEventListener('beforeunload', function() {
+            if (window.timeUpdateInterval) {
+                clearInterval(window.timeUpdateInterval);
+            }
+        });
+    </script>
+</body>
+</html>
