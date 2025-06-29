@@ -4,7 +4,8 @@
  * @returns {Promise<Object>} - Objeto con incomeStatementHistory, balanceSheetHistory y cashflowStatementHistory.
  */
 async function fetchFinancialStatements(symbol) {
-    const apikey = 'uJcXBH1CAZv548ID2NK2XL9rHSMblkeo';
+    // Usa tu nueva API key
+    const apikey = 'ztETFyB0BTuJFrDu1iTDl2Yv2JywtySr';
     const url = `https://financialmodelingprep.com/api/v3/income-statement/${symbol}?limit=4&apikey=${apikey}`;
     const res = await fetch(url);
     if (!res.ok) {

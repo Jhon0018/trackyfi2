@@ -2,7 +2,8 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>TrackYfi - Dashboard</title>
+    <title>Trackerfolios- Dashboard</title>
+    <link rel="icon" href="icono/icono trackerfolios2.png" type="image/png">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -71,6 +72,11 @@
                     <i class="fas fa-crown me-2"></i> Trackerfolio Premium
                 </button>
             </li>
+            <li>
+                <a href="https://t.me/trackerfolio" class="nav-link text-dark" target="_blank" rel="noopener">
+                    <i class="fab fa-telegram me-2"></i> Comunidad Telegram
+                </a>
+            </li>
         </ul>
     </div>
 
@@ -132,7 +138,7 @@
 
                 <!-- Formularios de Agregar Assets -->
                 <div class="row mb-4">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="card">
                             <div class="card-header d-flex align-items-center cursor-pointer" id="toggleAssetForm">
                                 <i class="fas fa-plus-circle me-2"></i>
@@ -200,7 +206,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="card">
                             <div class="card-header d-flex align-items-center cursor-pointer" id="toggleCryptoForm">
                                 <i class="fab fa-bitcoin me-2"></i>
@@ -253,6 +259,45 @@
                                         <i class="fab fa-bitcoin me-2"></i>Agregar Cripto
                                     </button>
                                 </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header d-flex align-items-center cursor-pointer"
+                                 data-bs-toggle="collapse"
+                                 data-bs-target="#cashFormContainer"
+                                 aria-controls="cashFormContainer">
+                                <i class="fas fa-wallet me-2"></i>
+                                <span>Agregar Efectivo</span>
+                                <i class="fas fa-chevron-down ms-auto"></i>
+                            </div>
+                            <div class="collapse" id="cashFormContainer">
+                                <div class="card-body p-0">
+                                    <!-- Formulario de agregar efectivo -->
+                                    <form id="addCashForm" class="p-3">
+                                        <div class="mb-3">
+                                            <label for="cash_amount" class="form-label">Monto</label>
+                                            <input type="number" step="0.01" class="form-control" id="cash_amount" name="cash_amount" required="">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="cash_currency" class="form-label">Divisa</label>
+                                            <select class="form-control" id="cash_currency" name="cash_currency">
+                                                <option value="USD">USD</option>
+                                                <option value="EUR">EUR</option>
+                                                <option value="COP">COP</option>
+                                                <option value="MXN">MXN</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="cash_notes" class="form-label">Notas</label>
+                                            <textarea class="form-control" id="cash_notes" name="cash_notes"></textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-info w-100">
+                                            <i class="fas fa-wallet me-2"></i>Agregar Efectivo
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -383,6 +428,9 @@
         <!-- Chart.js para gráficas -->
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <!-- Highcharts para gráficas avanzadas -->
+        <script src="https://cdn.jsdelivr.net/npm/highcharts@10.3.3/modules/export-data.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/highcharts@10.3.3/modules/exporting.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/highcharts@10.3.3/highcharts.js"></script>
         <script src="https://code.highcharts.com/highcharts.js"></script>
         <script type="module" src="home.js"></script>
     </div>

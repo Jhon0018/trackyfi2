@@ -17,31 +17,47 @@
     <span class="b2"></span>
     <span class="b3"></span>
 </div>
-<div class="container fade-in">
-    <h2 class="mb-4 text-center neon-glow"><i class="fas fa-balance-scale"></i> Estado Financiero de <span id="symbolTitle">AAPL</span></h2>
-    <div class="mb-4 d-flex flex-wrap justify-content-center align-items-center gap-2">
-        <input type="text" id="symbolInput" class="form-control shadow input-max-width" placeholder="Ej: AAPL, MSFT, TSLA">
-        <button class="btn btn-primary shadow" onclick="loadFinancials()"><i class="fas fa-search"></i> Buscar</button>
-        <select id="viewMode" class="form-select shadow input-max-width" title="Selecciona el modo de vista">
-            <option value="anual" selected>Visión Anual</option>
-            <option value="trimestral">Visión Trimestral</option>
-        </select>
+<div class="d-flex">
+    <!-- Barra lateral izquierda -->
+    <nav class="sidebar p-3 custom-sidebar">
+        <h4 class="mb-4 text-center"><i class="fas fa-coins"></i>TRACKERFOLIO</h3>
+        <ul class="nav flex-column gap-2">
+            <li class="nav-item">
+                <a class="nav-link" href="home.html"><i class="fas fa-home"></i> Inicio</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="estado.html"><i class="fas fa-balance-scale"></i> Estado Financiero</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="home.html"><i class="fas fa-briefcase"></i> Portafolio</a>
+            </li>
+            <!-- Agrega más enlaces si lo necesitas -->
+        </ul>
+    </nav>
+    <!-- Contenido principal reducido -->
+    <div class="container fade-in flex-grow-1 estado-container">
+        <h2 class="mb-4 text-center neon-glow"><i class="fas fa-balance-scale"></i> Estado Financiero de <span id="symbolTitle">AAPL</span></h2>
+        <div class="mb-4 d-flex flex-wrap justify-content-center align-items-center gap-2">
+            <input type="text" id="symbolInput" class="form-control shadow input-max-width" placeholder="Ej: AAPL, MSFT, TSLA">
+            <button class="btn btn-primary shadow" onclick="loadFinancials()"><i class="fas fa-search"></i> Buscar</button>
+            <select id="viewMode" class="form-select shadow input-max-width" title="Selecciona el modo de vista">
+                <option value="anual" selected>Visión Anual</option>
+                <option value="trimestral">Visión Trimestral</option>
+            </select>
+        </div>
+        <div id="ratios" class="row g-4 justify-content-center"></div>
+        <hr>
+        <h4 class="mt-4 neon-glow"><i class="fas fa-chart-line"></i> Estado de Resultados</h4>
+        <div id="incomeTable"></div>
+        <div id="incomeGrowthTable" class="mt-4"></div>
+        <div id="marginsTable" class="mt-4"></div>
+        <h4 class="mt-4 neon-glow"><i class="fas fa-building-columns"></i> Balance General</h4>
+        <div id="balanceTable" class="table-responsive"></div>
+        <h4 class="mt-4 neon-glow"><i class="fas fa-money-bill-wave"></i> Flujo de Caja</h4>
+        <div id="cashflowTable" class="table-responsive"></div>
     </div>
-    <div id="ratios" class="row g-4 justify-content-center"></div>
-    <hr>
-    <h4 class="mt-4 neon-glow"><i class="fas fa-chart-line"></i> Estado de Resultados</h4>
-    <div id="incomeTable"></div>
-    <!-- Nueva tabla de evolución porcentual debajo de Estado de Resultados -->
-    <div id="incomeGrowthTable" class="mt-4"></div>
-    <!-- Debajo de la tabla de Estado de Resultados, agrega este div para la tabla de márgenes -->
-    <div id="marginsTable" class="mt-4"></div>
-    <h4 class="mt-4 neon-glow"><i class="fas fa-building-columns"></i> Balance General</h4>
-    <div id="balanceTable" class="table-responsive"></div>
-    <h4 class="mt-4 neon-glow"><i class="fas fa-money-bill-wave"></i> Flujo de Caja</h4>
-    <div id="cashflowTable" class="table-responsive"></div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
 <script type="module" src="financiero.js"></script>
-
 </body>
 </html>

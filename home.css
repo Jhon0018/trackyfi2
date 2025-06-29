@@ -39,6 +39,19 @@ body {
     height: 100vh;
     display: flex;
     flex-direction: column;
+    overflow-y: auto;
+    max-height: 100vh;
+    /* Opcional: mejora la apariencia del scroll en navegadores modernos */
+    /* Firefox */
+}
+/* WebKit browsers */
+#sidebar::-webkit-scrollbar {
+    width: 8px;
+    background: #f8f9fa;
+}
+#sidebar::-webkit-scrollbar-thumb {
+    background: #bbb;
+    border-radius: 4px;
 }
 #sidebar .nav-link {
     color: #18181b;
@@ -322,7 +335,7 @@ body.dark-mode .stat-label {
 }
 body.dark-mode .table,
 body.dark-mode .table-striped,
-body.dark-mode .table-responsive {
+body.dark_mode .table-responsive {
     background: #23232a !important;
     color: #fff !important;
 }

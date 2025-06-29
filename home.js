@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-import { getFirestore, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, query, where, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 // Configuración Firebase
 const firebaseConfig = {
@@ -508,6 +508,9 @@ function renderPortfolio() {
         renderCharts();
         return;
     }
+    // Calcular el total de la cartera (suma de la columna "Valor")
+    const totalValor = portfolioData.reduce((sum, asset) => sum + (asset.value || 0), 0);
+
     let tableHTML = `
         <div class="table-responsive">
             <table class="table table-striped">
@@ -519,6 +522,7 @@ function renderPortfolio() {
                         <th>Precio Compra</th>
                         <th>Precio Actual</th>
                         <th>Valor</th>
+                        <th>Peso</th> <!-- Nueva columna -->
                         <th>Ganancia/Pérdida</th>
                         <th>Divisa</th>
                         <th>Detalle</th>
@@ -540,34 +544,26 @@ function renderPortfolio() {
             ? `<span class="text-danger">${asset.priceError || 'No se pudo obtener el precio. Consulta detalles.'}</span>`
             : `<span class="${profitClass}">${formatCurrency(asset.profit)}</span>`;
 
+        // Calcular el peso del activo en la cartera
+        const peso = totalValor > 0 ? ((asset.value || 0) / totalValor * 100).toFixed(2) + '%' : '0%';
+
         tableHTML += `
             <tr>
-                <td>
-                    <i class="${icon} me-2"></i>
-                    ${asset.name}
-                </td>
-                <td>${asset.ticker}</td>
-                <td>${asset.quantity}</td>
+                <td><i class="${icon} me-1"></i> ${asset.name || ''}</td>
+                <td>${asset.ticker || ''}</td>
+                <td>${asset.quantity || ''}</td>
                 <td>${formatCurrency(asset.purchase_price)}</td>
                 <td>${priceActual}</td>
-                <td>${asset.current_price === null || asset.current_price === undefined ? '<span class="text-danger">No existe</span>' : formatCurrency(asset.value)}</td>
+                <td>${formatCurrency(asset.value)}</td>
+                <td>${peso}</td> <!-- Nueva columna -->
                 <td>${profitValue}</td>
-                <td>${asset.currency || 'USD'}</td>
+                <td>${asset.currency || ''}</td>
                 <td>
-                    <button class="btn btn-info btn-sm" onclick="window.viewDetails(${idx})">
-                        Ver Detalle
-                    </button>
+                    <button class="btn btn-sm btn-info" onclick="viewDetails(${idx})" title="Ver Detalles"><i class="fas fa-eye"></i></button>
                 </td>
                 <td>
-                    <button class="btn btn-warning btn-sm me-1" onclick="window.editAsset(${idx})">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn btn-danger btn-sm me-1" onclick="window.deleteAsset(${idx})">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                    <button class="btn btn-primary btn-sm" onclick="window.updateAssetPriceByISIN('${asset.isin}')">
-                        <i class="fas fa-sync-alt"></i> Actualizar
-                    </button>
+                    <button class="btn btn-sm btn-warning" onclick="editAsset(${idx})" title="Editar"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteAsset(${idx})" title="Eliminar"><i class="fas fa-trash"></i></button>
                 </td>
             </tr>
         `;
@@ -693,8 +689,19 @@ window.saveEdit = function () {
     showAlert('Activo actualizado exitosamente', 'success');
 };
 
-window.deleteAsset = function (idx) {
+window.deleteAsset = async function (idx) {
     if (confirm('¿Estás seguro de que deseas eliminar este activo?')) {
+        // Si el usuario está autenticado, elimina también de Firestore
+        if (currentUserId && portfolioData[idx]?.id) {
+            try {
+                // Determina si es activo o cripto
+                const tipo = portfolioData[idx].type === 'crypto' ? 'cripto' : 'activo';
+                await deleteDoc(doc(db, tipo, portfolioData[idx].id));
+            } catch (e) {
+                showAlert('No se pudo eliminar de la nube: ' + e.message, 'danger');
+            }
+        }
+        // Elimina del array local y guarda en localStorage
         portfolioData.splice(idx, 1);
         savePortfolio();
         updateStats();
@@ -791,6 +798,27 @@ document.getElementById('toggleAssetForm').addEventListener('click', function ()
 document.getElementById('toggleCryptoForm').addEventListener('click', function () {
     const form = document.getElementById('cryptoFormContainer');
     form.style.display = form.style.display === 'none' ? 'block' : 'none';
+});
+document.getElementById('addCashForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const cash = {
+        name: 'Efectivo',
+        ticker: 'CASH',
+        type: 'cash',
+        quantity: 1,
+        purchase_price: parseFloat(document.getElementById('cash_amount').value),
+        current_price: parseFloat(document.getElementById('cash_amount').value),
+        value: parseFloat(document.getElementById('cash_amount').value),
+        currency: document.getElementById('cash_currency').value,
+        notes: document.getElementById('cash_notes').value,
+        profit: 0
+    };
+    portfolioData.push(cash);
+    savePortfolio();
+    updateStats();
+    renderPortfolio();
+    this.reset();
+    showAlert('Efectivo agregado exitosamente', 'success');
 });
 
 // Modo oscuro
