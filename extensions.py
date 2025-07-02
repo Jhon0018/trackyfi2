@@ -20,7 +20,8 @@ def precio_por_isin(isin):
         # 1. Consulta OpenFIGI para obtener el ticker
         headers = {
             "Content-Type": "application/json",
-            "X-OPENFIGI-APIKEY": OPENFIGI_API_KEY
+            "X-OPENFIGI-APIKEY": 
+            "f4ae7665-74e9-41e9-bc73-3764b37f2d2d"
         }
         body = [{"idType": "ID_ISIN", "idValue": isin}]
         figi_resp = requests.post("https://api.openfigi.com/v3/mapping", json=body, headers=headers)

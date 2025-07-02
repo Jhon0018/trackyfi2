@@ -773,16 +773,15 @@ body.dark-mode #capitalLineChart + * {
 }
 
 #portfolioContent .table {
-    width: 100% !important;
-    min-width: 600px;
-    max-width: 100%;
-    margin: 0 auto;
-    border-radius: 0.7rem;
+    width: 98vw !important;
+    max-width: 1400px;
+    min-width: 900px;
+    margin: 0 auto 2rem auto;
+    font-size: 1.05rem;
     background: #fff;
     color: #18181b;
+    border-radius: 0.7rem;
     box-shadow: 0 1px 6px 0 rgba(0,0,0,0.04);
-    font-size: 0.93rem;
-    table-layout: auto;
     transition: background 0.4s, color 0.3s;
 }
 
@@ -836,4 +835,14 @@ body.dark-mode #capitalLineChart + * {
     border-radius: 1rem;
     box-shadow: 0 2px 12px 0 rgba(0,0,0,0.04);
     padding: 0.5rem;
+}
+
+/* Columna de Ganancia/Pérdida en verde puro o rojo puro */
+#portfolioContent .profit-pure-green {
+    color: #00c800 !important;
+    font-weight: bold;
+}
+#portfolioContent .profit-pure-red {
+    color: #ff0000 !important;
+    font-weight: bold;
 }
